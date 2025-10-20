@@ -1,0 +1,31 @@
+﻿@* Bu sayfanın bir "Kullanici" listesi beklediğini belirtiyoruz *@
+@model IEnumerable<SoruCevapPortali.Models.Kullanici>
+
+@{
+    ViewData["Title"] = "Kullanıcı Listesi";
+}
+
+<h1>Kullanıcı Yönetimi</h1>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Kullanıcı Adı</th>
+            <th>Email</th>
+            <th>Kayıt Tarihi</th>
+        </tr>
+    </thead>
+    <tbody>
+        @* Model ile gelen her bir kullanıcı için döngü oluşturuyoruz *@
+        @foreach (var kullanici in Model)
+        {
+            <tr>
+                <td>@kullanici.Id</td>
+                <td>@kullanici.KullaniciAdi</td>
+                <td>@kullanici.Email</td>
+                <td>@kullanici.KayitTarihi.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
+</table>

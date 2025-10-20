@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using SoruCevapPortali.Interfaces;
+using SoruCevapPortali.Models;
+using SoruCevapPortali.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // DbContext'i ve SQL Server baðlantýsýný servislere ekliyoruz
 builder.Services.AddDbContext<SoruCevapPortali.Data.ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+builder.Services.AddScoped<IRepository<Kullanici>, KullaniciRepository>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -27,6 +31,12 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+// Admin gibi alanlara (Area) giden yolu tarif eden kural
+app.MapControllerRoute(
+  name: "areas",
+  pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+);
 
 app.MapControllerRoute(
     name: "default",
