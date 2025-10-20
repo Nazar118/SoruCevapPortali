@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SoruCevapPortali.Interfaces; // IRepository'yi kullanabilmek için ekledik
 using SoruCevapPortali.Models;      // Kullanici modelini kullanabilmek için ekledik
 
 namespace SoruCevapPortali.Areas.Admin.Controllers
 {
     [Area("Admin")] // Bu controller'ın Admin Area'sına ait olduğunu belirtiyoruz.
+    [Authorize]
     public class KullaniciController : Controller
     {
         // Veritabanı işlemleri için repository'mizi tutacak olan değişken

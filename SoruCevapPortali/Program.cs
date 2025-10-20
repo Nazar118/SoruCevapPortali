@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using SoruCevapPortali.Interfaces;
 using SoruCevapPortali.Models;
@@ -13,6 +14,13 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<SoruCevapPortali.Data.ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IRepository<Kullanici>, KullaniciRepository>();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Admin/Auth/Login"; // Giriþ yapýlmamýþsa yönlendirilecek sayfa
+        options.LogoutPath = "/Admin/Auth/Logout";
+        options.AccessDeniedPath = "/Admin/Auth/AccessDenied"; // Yetkisi yoksa 
+    });
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -27,7 +35,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
