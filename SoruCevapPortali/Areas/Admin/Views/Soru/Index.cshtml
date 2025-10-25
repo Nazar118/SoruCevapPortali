@@ -1,0 +1,41 @@
+﻿@model IEnumerable<SoruCevapPortali.Models.Soru>
+
+@{
+    ViewData["Title"] = "Soru Listesi";
+}
+
+<h1>Soru Yönetimi</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Başlık</th>
+                        <th>Soruyu Soran</th>
+                        <th>Oluşturma Tarihi</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var soru in Model)
+                    {
+                        <tr>
+                            <td>@soru.Id</td>
+                            <td>@soru.Baslik</td>
+                            <td>@(soru.SoranKullanici?.KullaniciAdi ?? "Bilinmiyor")</td>
+                            <td>@soru.OlusturmaTarihi.ToShortDateString()</td>
+                            <td>
+                                <form asp-action="Delete" asp-route-id="@soru.Id" method="post" onsubmit="return confirm('Bu soruyu silmek istediğinizden emin misiniz?');">
+                                    <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -8,5 +8,8 @@ namespace SoruCevapPortali.Models
         public string Email { get; set; }
         public string Sifre { get; set; } // Şimdilik böyle, Identity ile daha güvenli yapacağız
         public DateTime KayitTarihi { get; set; }
+        public virtual ICollection<Soru>  Sorular { get; set; }
+        public virtual ICollection<Cevap> Cevaplar { get; set; }
+        
     }
 }

@@ -14,6 +14,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<SoruCevapPortali.Data.ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IRepository<Kullanici>, KullaniciRepository>();
+builder.Services.AddScoped<IRepository<Soru>, SoruRepository>();
+builder.Services.AddScoped<IRepository<Cevap>, CevapRepository>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

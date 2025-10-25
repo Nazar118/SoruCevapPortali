@@ -14,5 +14,6 @@ namespace SoruCevapPortali.Models
         public int KullaniciId { get; set; }
         [ForeignKey("KullaniciId")]
         public virtual Kullanici SoranKullanici { get; set; }
+        public virtual ICollection<Cevap> Cevaplar { get; set; }
     }
 }
