@@ -46,6 +46,12 @@
                     <span>Soru Yönetimi</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/Admin/Cevap">
+                    <i class="fas fa-fw fa-comment-alt"></i>
+                    <span>Cevap Yönetimi</span>
+                </a>
+            </li>
             <hr class="sidebar-divider d-none d-md-block">
 
             <div class="text-center d-none d-md-inline">
@@ -126,6 +132,7 @@
     <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
 
     <script src="~/js/sb-admin-2.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 
 
 </body>

@@ -16,37 +16,37 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
             _kullaniciRepository = kullaniciRepository;
         }
 
-        // BU METOT ZATEN VARDI, KULLANICILARI LİSTELER
+        // --- 1. Metot: Listeleme ---
         public IActionResult Index()
         {
             var kullanicilar = _kullaniciRepository.GetAll();
             return View(kullanicilar);
         }
-        // Boş "Yeni Kullanıcı Ekle" formunu göstermek için.
-        // Adres: /Admin/Kullanici/Create
+
+        // --- 2. Metot: Yeni Ekle Sayfasını Aç (GET) ---
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // Dolu formdan gelen bilgileri kaydedip listeye yönlendirmek için.
+        // --- 3. Metot: Yeni Eklemeyi Kaydet (POST) ---
         [HttpPost]
-        [ValidateAntiForgeryToken] // Güvenlik için
+        [ValidateAntiForgeryToken]
         public IActionResult Create(Kullanici kullanici)
         {
             if (ModelState.IsValid)
             {
-                kullanici.KayitTarihi = DateTime.Now; // Kayıt tarihini o an olarak ayarla
+                kullanici.KayitTarihi = DateTime.Now;
                 _kullaniciRepository.Add(kullanici);
-                return RedirectToAction(nameof(Index)); // Listeleme sayfasına geri dön
+                return RedirectToAction(nameof(Index));
             }
-            return View(kullanici); // Bir hata varsa formu tekrar göster
+            return View(kullanici);
         }
 
-        // "Sil" butonuna basıldığında çalışacak metot.
+        // --- 4. Metot: Silme İşlemi (POST) ---
         [HttpPost]
-        [ValidateAntiForgeryToken] // Güvenlik için
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             var kullanici = _kullaniciRepository.GetById(id);
@@ -54,7 +54,59 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
             {
                 _kullaniciRepository.Delete(kullanici);
             }
-            return RedirectToAction(nameof(Index)); // Her durumda listeleme sayfasına geri dön
+            return RedirectToAction(nameof(Index));
         }
-    }
-}
+
+        // --- 5. Metot: Düzenle Sayfasını Aç (GET) ---
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var kullanici = _kullaniciRepository.GetById(id);
+            if (kullanici == null)
+            {
+                return NotFound();
+            }
+            return View(kullanici);
+        }
+
+        // --- 6. Metot: Düzenlemeyi Kaydet (POST) ---
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Kullanici kullanici)
+        {
+            if (ModelState.IsValid)
+            {
+                var existingUser = _kullaniciRepository.GetById(kullanici.Id);
+                if (existingUser == null)
+                {
+                    return NotFound();
+                }
+
+                existingUser.KullaniciAdi = kullanici.KullaniciAdi;
+                existingUser.Email = kullanici.Email;
+                existingUser.Sifre = kullanici.Sifre;
+                _kullaniciRepository.Update(existingUser);
+
+                return RedirectToAction(nameof(Index));
+            }
+            return View(kullanici);
+        }
+
+        // --- 7. Metot: AJAX ile Durum Değiştirme (POST) ---
+        [HttpPost]
+        public IActionResult ToggleStatus(int id)
+        {
+            var kullanici = _kullaniciRepository.GetById(id);
+            if (kullanici == null)
+            {
+                return NotFound();
+            }
+
+            kullanici.AktifMi = !kullanici.AktifMi;
+            _kullaniciRepository.Update(kullanici);
+
+            return Json(new { success = true, isActive = kullanici.AktifMi });
+        }
+
+    } 
+} 

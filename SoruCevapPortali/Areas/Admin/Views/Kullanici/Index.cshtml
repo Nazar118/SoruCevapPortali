@@ -5,6 +5,7 @@
 }
 
 <h1>Kullanıcı Yönetimi</h1>
+@Html.AntiForgeryToken()
 
 <p>
     <a asp-action="Create" class="btn btn-primary">Yeni Kullanıcı Ekle</a>
@@ -20,7 +21,9 @@
                         <th>Kullanıcı Adı</th>
                         <th>Email</th>
                         <th>Kayıt Tarihi</th>
-                        <th>İşlemler</th>
+                        <th>Durum</th>
+                        <th>Düzenle</th> @* <-- YENİ SÜTUN BAŞLIĞI *@
+                        <th>Sil</th>     @* <-- YENİ SÜTUN BAŞLIĞI *@
                     </tr>
                 </thead>
                 <tbody>
@@ -31,8 +34,18 @@
                             <td>@kullanici.KullaniciAdi</td>
                             <td>@kullanici.Email</td>
                             <td>@kullanici.KayitTarihi.ToShortDateString()</td>
+
                             <td>
-                                @* Silme işlemini güvenli yapmak için bir form kullanıyoruz *@
+                                <button class="btn btn-sm toggle-status-btn @(kullanici.AktifMi ? "btn-success" : "btn-warning")" data-id="@kullanici.Id">
+                                    @(kullanici.AktifMi ? "Aktif" : "Pasif")
+                                </button>
+                            </td>
+
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@kullanici.Id" class="btn btn-success btn-sm">Düzenle</a>
+                            </td>
+
+                            <td>
                                 <form asp-action="Delete" asp-route-id="@kullanici.Id" method="post" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?');">
                                     <button type="submit" class="btn btn-danger btn-sm">Sil</button>
                                 </form>
@@ -44,3 +57,37 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.toggle-status-btn').click(function () {
+                var button = $(this);
+                var userId = button.data('id');
+
+                $.ajax({
+                    url: '/Admin/Kullanici/ToggleStatus',
+                    type: 'POST',
+                    data: { id: userId },
+                    headers: {
+                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            if (response.isActive) {
+                                button.removeClass('btn-warning').addClass('btn-success').text('Aktif');
+                            } else {
+                                button.removeClass('btn-success').addClass('btn-warning').text('Pasif');
+                            }
+                        } else {
+                            alert("Bir hata oluştu!");
+                        }
+                    },
+                    error: function () {
+                        alert("Sunucuyla iletişim kurulamadı!");
+                    }
+                });
+            });
+        });
+    </script>
+}

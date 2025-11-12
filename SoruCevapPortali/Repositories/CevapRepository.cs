@@ -1,4 +1,5 @@
-﻿using SoruCevapPortali.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SoruCevapPortali.Data;
 using SoruCevapPortali.Interfaces;
 using SoruCevapPortali.Models;
 
@@ -22,8 +23,12 @@ namespace SoruCevapPortali.Repositories
             _context.SaveChanges();
         }
         public IEnumerable<Cevap> GetAll()
-        { 
-        return _context.Cevaplar.ToList();
+        {
+            // .Include() ile Cevap'a bağlı olan CevaplayanKullanici ve AitOlduguSoru bilgilerini de çekiyoruz.
+            return _context.Cevaplar
+                       .Include(c => c.CevaplayanKullanici)
+                       .Include(c => c.AitOlduguSoru)
+                       .ToList();
         }
         public Cevap GetById(int id)
         {
