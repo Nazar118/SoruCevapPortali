@@ -16,6 +16,7 @@ builder.Services.AddDbContext<SoruCevapPortali.Data.ApplicationDbContext>(option
 builder.Services.AddScoped<IRepository<Kullanici>, KullaniciRepository>();
 builder.Services.AddScoped<IRepository<Soru>, SoruRepository>();
 builder.Services.AddScoped<IRepository<Cevap>, CevapRepository>();
+builder.Services.AddScoped<IRepository<Kategori>, KategoriRepository>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

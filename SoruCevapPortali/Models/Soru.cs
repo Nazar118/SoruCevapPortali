@@ -14,6 +14,10 @@ namespace SoruCevapPortali.Models
         [Required(ErrorMessage = "İçerik zorunludur.")]
         public string Icerik { get; set; }
 
+        public int? KategoriId { get; set; }
+        [ForeignKey("KategoriId")]
+        public virtual Kategori? Kategori { get; set; }
+
         public DateTime OlusturmaTarihi { get; set; }
 
         public int KullaniciId { get; set; }

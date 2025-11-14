@@ -13,6 +13,7 @@ namespace SoruCevapPortali.Data
         public DbSet<Kullanici> Kullanicilar { get; set; }
         public DbSet<Soru> Sorular { get; set; }
         public DbSet<Cevap> Cevaplar { get; set; }
+        public DbSet<Kategori> Kategoriler { get; set;  }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

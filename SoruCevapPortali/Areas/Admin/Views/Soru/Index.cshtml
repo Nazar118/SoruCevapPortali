@@ -16,6 +16,7 @@
                         <th>Başlık</th>
                         <th>Soruyu Soran</th>
                         <th>Oluşturma Tarihi</th>
+                        <th>Düzenle</th>
                         <th>İşlemler</th>
                     </tr>
                 </thead>
@@ -27,6 +28,8 @@
                             <td>@soru.Baslik</td>
                             <td>@(soru.SoranKullanici?.KullaniciAdi ?? "Bilinmiyor")</td>
                             <td>@soru.OlusturmaTarihi.ToShortDateString()</td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@soru.Id" class="btn btn-primary btn-sm">Düzenle</a>
                             <td>
                                 <form asp-action="Delete" asp-route-id="@soru.Id" method="post" onsubmit="return confirm('Bu soruyu silmek istediğinizden emin misiniz?');">
                                     <button type="submit" class="btn btn-danger btn-sm">Sil</button>
