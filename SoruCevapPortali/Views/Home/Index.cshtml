@@ -1,8 +1,43 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<SoruCevapPortali.Models.Question>
+
+@{
+    ViewData["Title"] = "Ana Sayfa - Son Sorular";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Soru Cevap Portalı</h1>
+    <p>Aklınızdaki soruları sorun, bilgilerinizi paylaşın.</p>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Son Sorular</h2>
+
+        @if (Model != null && Model.Any())
+        {
+            foreach (var soru in Model)
+            {
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">@soru.title</h5>
+                        <p class="card-text">@soru.contents</p>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <span class="badge badge-info" style="font-size: 0.9rem;">@soru.Category?.name</span> ·
+                        <strong>@soru.Answers.Count()</strong> cevap ·
+                        @soru.User?.User_name tarafından
+                        @soru.creation_date.ToShortDateString() tarihinde soruldu.
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info" role="alert">
+                Henüz gösterilecek onaylanmış bir soru bulunmamaktadır.
+            </div>
+        }
+    </div>
 </div>

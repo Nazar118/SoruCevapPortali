@@ -13,10 +13,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // DbContext'i ve SQL Server baðlantýsýný servislere ekliyoruz
 builder.Services.AddDbContext<SoruCevapPortali.Data.ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
-builder.Services.AddScoped<IRepository<Kullanici>, KullaniciRepository>();
-builder.Services.AddScoped<IRepository<Soru>, SoruRepository>();
-builder.Services.AddScoped<IRepository<Cevap>, CevapRepository>();
-builder.Services.AddScoped<IRepository<Kategori>, KategoriRepository>();
+builder.Services.AddScoped<IRepository<User>, UserRepository>();
+builder.Services.AddScoped<IRepository<Question>, QuestionRepository>();
+builder.Services.AddScoped<IRepository<Answer>, AnswerRepository>();
+builder.Services.AddScoped<IRepository<Category>, CategoryRepository>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

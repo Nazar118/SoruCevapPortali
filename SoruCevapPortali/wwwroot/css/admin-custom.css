@@ -1,0 +1,41 @@
+﻿.welcome-message-container {
+    background-color: #1cc88a; /* Şablonumuzdaki güzel yeşil renk */
+    border-radius: 15px; /* Kenarları yuvarlatılmış */
+    padding: 0 10px; /* İçten boşluk */
+    overflow: hidden; /* Taşan yazıları gizle (kaybolma efekti için) */
+    white-space: nowrap; /* Yazının alt satıra kaymasını engelle */
+    /* Animasyonu çağırıyoruz: 7 saniye sürecek ve bitince kalacak */
+    animation: slide-in-and-out 7s ease-in-out forwards;
+}
+
+    .welcome-message-container span {
+        color: white; /* Beyaz renkli yazı */
+        font-weight: bold; /* Kalın yazı */
+        line-height: 30px; /* Dikey olarak ortalamak için (opsiyonel) */
+    }
+
+
+@keyframes slide-in-and-out {
+    0% {
+        opacity: 0; /* Görünmez başla */
+        transform: translateX(-100px); /* Ekranın 100px solundan başla */
+        max-width: 0px; /* Genişliği 0 olsun */
+    }
+    15% {
+        opacity: 1; /* Görünür ol */
+        transform: translateX(0); /* Normal pozisyonuna gel */
+        max-width: 250px; /* Tam genişliğine ulaş */
+    }
+
+    85% {
+        opacity: 1;
+        transform: translateX(0);
+        max-width: 250px;
+    }
+    /* 100%: Animasyonun sonu (kaybolma) */
+    100% {
+        opacity: 0; /* Tekrar görünmez ol */
+        transform: translateX(50px); /* Sağa doğru kayarak kaybol */
+        max-width: 0px; /* Genişliğini sıfırla */
+    }
+}

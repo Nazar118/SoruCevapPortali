@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SoruCevapPortali.Models.Soru>
+﻿@model IEnumerable<SoruCevapPortali.Models.Question>
 
 @{
     ViewData["Title"] = "Soru Listesi";
@@ -24,9 +24,9 @@
                     {
                         <tr>
                             <td>@soru.Id</td>
-                            <td>@soru.Baslik</td>
-                            <td>@(soru.SoranKullanici?.KullaniciAdi ?? "Bilinmiyor")</td>
-                            <td>@soru.OlusturmaTarihi.ToShortDateString()</td>
+                            <td>@soru.title</td>
+                            <td>@(soru.User?.User_name ?? "Bilinmiyor")</td>
+                            <td>@soru.creation_date.ToShortDateString()</td>
                             <td>
                                 <form asp-action="Delete" asp-route-id="@soru.Id" method="post" onsubmit="return confirm('Bu soruyu silmek istediğinizden emin misiniz?');">
                                     <button type="submit" class="btn btn-danger btn-sm">Sil</button>

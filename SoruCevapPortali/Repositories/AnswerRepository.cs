@@ -5,38 +5,38 @@ using SoruCevapPortali.Models;
 
 namespace SoruCevapPortali.Repositories
 {
-    public class CevapRepository : IRepository<Cevap>
+    public class AnswerRepository : IRepository<Answer>
     {
         private readonly ApplicationDbContext _context;
-        public CevapRepository(ApplicationDbContext context)
+        public AnswerRepository(ApplicationDbContext context)
         {
             _context = context;
         }
-        public void Add(Cevap entity)
+        public void Add(Answer entity)
         {
-            _context.Cevaplar.Add(entity);
+            _context.Answers.Add(entity);
             _context.SaveChanges();
         }
-        public void Delete(Cevap entity)
+        public void Delete(Answer entity)
         {
-            _context.Cevaplar.Remove(entity);
+            _context.Answers.Remove(entity);
             _context.SaveChanges();
         }
-        public IEnumerable<Cevap> GetAll()
+        public IEnumerable<Answer> GetAll()
         {
             // .Include() ile Cevap'a bağlı olan CevaplayanKullanici ve AitOlduguSoru bilgilerini de çekiyoruz.
-            return _context.Cevaplar
-                       .Include(c => c.CevaplayanKullanici)
-                       .Include(c => c.AitOlduguSoru)
+            return _context.Answers
+                       .Include(c => c.User)
+                       .Include(c => c.Question)
                        .ToList();
         }
-        public Cevap GetById(int id)
+        public Answer GetById(int id)
         {
-            return _context.Cevaplar.Find(id);
+            return _context.Answers.Find(id);
         }
-        public void Update(Cevap entity)
+        public void Update(Answer entity)
         { 
-            _context.Cevaplar.Update(entity);
+            _context.Answers.Update(entity);
             _context.SaveChanges();
         }
     }

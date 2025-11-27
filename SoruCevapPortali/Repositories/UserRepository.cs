@@ -4,41 +4,41 @@ using SoruCevapPortali.Models;
 
 namespace SoruCevapPortali.Repositories
 {
-    public class KullaniciRepository : IRepository<Kullanici>
+    public class UserRepository : IRepository<User>
     {
         private readonly ApplicationDbContext _context;
 
         // Bu sınıfa çalışması için veritabanı bağlantısı (DbContext) veriliyor.
-        public KullaniciRepository(ApplicationDbContext context)
+        public UserRepository(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public void Add(Kullanici entity)
+        public void Add(User entity)
         {
-            _context.Kullanicilar.Add(entity);
+            _context.Users.Add(entity);
             _context.SaveChanges(); // Değişiklikleri veritabanına kaydet
         }
 
-        public void Delete(Kullanici entity)
+        public void Delete(User entity)
         {
-            _context.Kullanicilar.Remove(entity);
+            _context.Users.Remove(entity);
             _context.SaveChanges();
         }
 
-        public IEnumerable<Kullanici> GetAll()
+        public IEnumerable<User> GetAll()
         {
-            return _context.Kullanicilar.ToList();
+            return _context.Users.ToList();
         }
 
-        public Kullanici GetById(int id)
+        public User GetById(int id)
         {
-            return _context.Kullanicilar.Find(id);
+            return _context.Users.Find(id);
         }
 
-        public void Update(Kullanici entity)
+        public void Update(User entity)
         {
-            _context.Kullanicilar.Update(entity);
+            _context.Users.Update(entity);
             _context.SaveChanges();
         }
     }

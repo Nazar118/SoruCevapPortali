@@ -1,21 +1,34 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore; // Include için eklendi
+using SoruCevapPortali.Data; // DbContext için eklendi
 using SoruCevapPortali.Models;
+using System.Diagnostics;
 
 namespace SoruCevapPortali.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        // _logger yerine _context'i kullanýyoruz
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        // Constructor'ý da _context'i alacak þekilde deðiþtiriyoruz
+        public HomeController(ApplicationDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
+        // Burasý sitenin ana sayfasý olacak (örn: https://localhost:7163/)
         public IActionResult Index()
         {
-            return View();
+            var sorular = _context.Questions
+                                  .Include(s => s.User)
+                                  .Include(s => s.Answers)
+                                  .Include(s => s.Category)
+                                  .Where(s => s.Is_ýt_approved == true) // Sadece onaylý sorular
+                                  .OrderByDescending(s => s.creation_date)
+                                  .ToList();
+
+            return View(sorular); // Modeli View'a gönder
         }
 
         public IActionResult Privacy()

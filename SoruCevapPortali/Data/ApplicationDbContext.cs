@@ -1,5 +1,4 @@
-﻿// Burası Data/ApplicationDbContext.cs dosyasının son hali
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SoruCevapPortali.Models;
 
 namespace SoruCevapPortali.Data
@@ -10,28 +9,27 @@ namespace SoruCevapPortali.Data
         {
         }
 
-        public DbSet<Kullanici> Kullanicilar { get; set; }
-        public DbSet<Soru> Sorular { get; set; }
-        public DbSet<Cevap> Cevaplar { get; set; }
-        public DbSet<Kategori> Kategoriler { get; set;  }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<Answer> Answers { get; set; }
+        public DbSet<Category> Categories { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Bir kullanıcı silinirse, ona ait soruların ve cevapların ne olacağı konusunda
-            // SQL'in kafasının karışmasını önlemek için varsayılan "Cascade Delete" davranışını değiştiriyoruz.
-            // Artık bir kullanıcının soruları veya cevapları varsa, o kullanıcı doğrudan silinemeyecek.
-
-            modelBuilder.Entity<Soru>()
-                .HasOne(s => s.SoranKullanici)
+            // DÜZELTME: SoranKullanici -> User, KullaniciId -> UserId
+            modelBuilder.Entity<Question>()
+                .HasOne(q => q.User)
                 .WithMany()
-                .HasForeignKey(s => s.KullaniciId)
+                .HasForeignKey(q => q.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Cevap>()
-                .HasOne(c => c.CevaplayanKullanici)
+            // DÜZELTME: CevaplayanKullanici -> User, KullaniciId -> UserId
+            modelBuilder.Entity<Answer>()
+                .HasOne(a => a.User)
                 .WithMany()
-                .HasForeignKey(c => c.KullaniciId)
+                .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

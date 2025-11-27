@@ -1,4 +1,4 @@
-﻿@model SoruCevapPortali.Models.Kullanici
+﻿@model SoruCevapPortali.Models.User
 
 @{
     ViewData["Title"] = "Kullanıcıyı Düzenle";
@@ -14,9 +14,9 @@
             <input type="hidden" asp-for="Id" />
 
             <div class="form-group">
-                <label asp-for="KullaniciAdi" class="control-label"></label>
-                <input asp-for="KullaniciAdi" class="form-control" />
-                <span asp-validation-for="KullaniciAdi" class="text-danger"></span>
+                <label asp-for="User_name" class="control-label"></label>
+                <input asp-for="User_name" class="form-control" />
+                <span asp-validation-for="User_name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Email" class="control-label"></label>
@@ -24,13 +24,13 @@
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Sifre" class="control-label"></label>
-                <input asp-for="Sifre" class="form-control" />
-                <span asp-validation-for="Sifre" class="text-danger"></span>
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
-            <input type="hidden" asp-for="KayitTarihi" />
-            <input type="hidden" asp-for="AktifMi" />
+            <input type="hidden" asp-for="registration_date" />
+            <input type="hidden" asp-for="Is_it_active" />
 
             <div class="form-group">
                 <input type="submit" value="Kaydet" class="btn btn-primary" />

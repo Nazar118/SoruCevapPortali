@@ -7,11 +7,11 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize]
-    public class KategoriController : Controller
+    public class CategoryController : Controller
     {
-        private readonly IRepository<Kategori> _kategoriRepository;
+        private readonly IRepository<Category> _kategoriRepository;
 
-        public KategoriController(IRepository<Kategori> kategoriRepository)
+        public CategoryController(IRepository<Category> kategoriRepository)
         {
             _kategoriRepository = kategoriRepository;
         }
@@ -33,7 +33,7 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
         // --- 3. Metot: Yeni Eklemeyi Kaydet (POST) ---
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Kategori kategori)
+        public IActionResult Create(Category kategori)
         {
             if (ModelState.IsValid)
             {
@@ -58,7 +58,7 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
         // --- 5. Metot: Düzenlemeyi Kaydet (POST) ---
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Kategori kategori)
+        public IActionResult Edit(Category kategori)
         {
             if (ModelState.IsValid)
             {

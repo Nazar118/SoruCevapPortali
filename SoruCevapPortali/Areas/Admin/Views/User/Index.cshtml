@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SoruCevapPortali.Models.Kullanici>
+﻿@model IEnumerable<SoruCevapPortali.Models.User>
 
 @{
     ViewData["Title"] = "Kullanıcı Listesi";
@@ -31,13 +31,13 @@
                     {
                         <tr>
                             <td>@kullanici.Id</td>
-                            <td>@kullanici.KullaniciAdi</td>
+                            <td>@kullanici.User_name</td>
                             <td>@kullanici.Email</td>
-                            <td>@kullanici.KayitTarihi.ToShortDateString()</td>
+                            <td>@kullanici.registration_date.ToShortDateString()</td>
 
                             <td>
-                                <button class="btn btn-sm toggle-status-btn @(kullanici.AktifMi ? "btn-success" : "btn-warning")" data-id="@kullanici.Id">
-                                    @(kullanici.AktifMi ? "Aktif" : "Pasif")
+                                <button class="btn btn-sm toggle-status-btn @(kullanici.Is_it_active ? "btn-success" : "btn-warning")" data-id="@kullanici.Id">
+                                    @(kullanici.Is_it_active ? "Aktif" : "Pasif")
                                 </button>
                             </td>
 

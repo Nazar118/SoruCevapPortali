@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SoruCevapPortali.Models.Kategori>
+﻿@model IEnumerable<SoruCevapPortali.Models.Category>
 @{
     ViewData["Title"] = "Kategori Yönetimi";
 }
@@ -27,7 +27,7 @@
                     {
                         <tr>
                             <td>@kategori.Id</td>
-                            <td>@kategori.Ad</td>
+                            <td>@kategori.name</td>
                             <td>
                                 <a asp-action="Edit" asp-route-id="@kategori.Id" class="btn btn-success btn-sm">Düzenle</a>
                             </td>

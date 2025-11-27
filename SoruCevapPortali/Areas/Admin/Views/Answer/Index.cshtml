@@ -1,0 +1,92 @@
+﻿@model IEnumerable<SoruCevapPortali.Models.Answer>
+
+@{
+    ViewData["Title"] = "Cevap Listesi";
+}
+
+<h1>Cevap Yönetimi</h1>
+@Html.AntiForgeryToken() <div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cevap İçeriği</th>
+                        <th>Cevaplayan</th>
+                        <th>Ait Olduğu Soru</th>
+                        <th>Tarih</th>
+                        <th>En İyi Cevap?</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cevap in Model)
+                    {
+                        <tr>
+                            <td>@cevap.Id</td>
+                            <td>@cevap.contents</td>
+                            <td>@(cevap.User?.User_name ?? "Bilinmiyor")</td>
+                            <td>@(cevap.Question?.title ?? "Bilinmiyor")</td>
+                            <td>@cevap.creation_date.ToShortDateString()</td>
+
+                            <td>
+                                <button class="btn btn-sm toggle-best-btn @(cevap.Is_it_the_best_answer ? "btn-success" : "btn-secondary")" data-id="@cevap.Id">
+                                    @(cevap.Is_it_the_best_answer ? "Evet (En İyi)" : "İşaretle")
+                                </button>
+                            </td>
+
+                            <td>
+                                <form asp-action="Delete" asp-route-id="@cevap.Id" method="post" onsubmit="return confirm('Bu cevabı silmek istediğinizden emin misiniz?');">
+                                    <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.toggle-best-btn').click(function () {
+                var clickedButton = $(this);
+                var cevapId = clickedButton.data('id');
+
+                $.ajax({
+                    url: '/Admin/Cevap/ToggleBestAnswer',
+                    type: 'POST',
+                    data: { id: cevapId },
+                    headers: {
+                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // Controller'dan o soruya ait tüm cevapların listesi geldi.
+                            // Şimdi sayfadaki tüm butonları bu listeye göre güncelleyelim.
+                            response.updatedAnswers.forEach(function(answer) {
+
+                                // Sayfadaki o cevaba ait butonu bul
+                                var buttonToUpdate = $('.toggle-best-btn[data-id="' + answer.id + '"]');
+
+                                if (answer.isBest) {
+                                    buttonToUpdate.removeClass('btn-secondary').addClass('btn-success').text('Evet (En İyi)');
+                                } else {
+                                    buttonToUpdate.removeClass('btn-success').addClass('btn-secondary').text('İşaretle');
+                                }
+                            });
+                        } else {
+                            alert("Bir hata oluştu!");
+                        }
+                    },
+                    error: function () {
+                        alert("Sunucuyla iletişim kurulamadı!");
+                    }
+                });
+            });
+        });
+    </script>
+}

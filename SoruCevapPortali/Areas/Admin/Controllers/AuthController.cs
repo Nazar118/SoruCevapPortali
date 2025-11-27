@@ -31,13 +31,13 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var kullanici = _context.Kullanicilar.FirstOrDefault(k => k.Email == model.Email && k.Sifre == model.Sifre);
+                var kullanici = _context.Users.FirstOrDefault(k => k.Email == model.Email && k.Password == model.Sifre);
 
                 if (kullanici != null)
                 {
                     var claims = new List<Claim>
                     {
-                        new Claim(ClaimTypes.Name, kullanici.KullaniciAdi),
+                        new Claim(ClaimTypes.Name, kullanici.User_name),
                         new Claim(ClaimTypes.Email, kullanici.Email),
                         new Claim("UserId", kullanici.Id.ToString())
                     };
@@ -46,8 +46,9 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
                     var authProperties = new AuthenticationProperties { };
 
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+                    TempData["ShowWelcomeAnimation"] = true;
 
-                    return RedirectToAction("Index", "Kullanici");
+                    return RedirectToAction("Index", "User");
                 }
                 else
                 {

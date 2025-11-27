@@ -1,0 +1,44 @@
+﻿@model SoruCevapPortali.Models.Question
+
+@{
+    ViewData["Title"] = "Soruyu Düzenle";
+}
+
+<h1>Soruyu Düzenle</h1>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="creation_date" />
+
+            <div class="form-group">
+                <label asp-for="CategoryId" class="control-label">Kategori</label>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Kategoriler">
+                    <option value="">-- Kategori Seçiniz --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="title" class="control-label"></label>
+                <input asp-for="title" class="form-control" />
+                <span asp-validation-for="title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="contents" class="control-label"></label>
+                <textarea asp-for="contents" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="contents" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Kaydet" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -5,37 +5,37 @@ using SoruCevapPortali.Models;
 
 namespace SoruCevapPortali.Repositories
 {
-    public class SoruRepository : IRepository<Soru>
+    public class QuestionRepository : IRepository<Question>
     {
         private readonly ApplicationDbContext _context;
-        public SoruRepository(ApplicationDbContext context)
+        public QuestionRepository(ApplicationDbContext context)
         {
 
             _context = context;
         }
 
-        public void Add(Soru entity)
+        public void Add(Question entity)
         {
-            _context.Sorular.Add(entity);
+            _context.Questions.Add(entity);
             _context.SaveChanges();
         }
-        public void Delete(Soru entity)
+        public void Delete(Question entity)
         {
-            _context.Sorular.Remove(entity);
+            _context.Questions.Remove(entity);
             _context.SaveChanges();
         }
-        public IEnumerable<Soru> GetAll()
+        public IEnumerable<Question> GetAll()
         {
             // .Include() ile Soru'ya bağlı olan SoranKullanici bilgisini de çekiyoruz.
-            return _context.Sorular.Include(s => s.SoranKullanici).ToList();
+            return _context.Questions.Include(s => s.User).ToList();
         }
-        public Soru GetById(int id)
+        public Question GetById(int id)
         {
-            return _context.Sorular.Find(id);
+            return _context.Questions.Find(id);
         }
-        public void Update(Soru entity)
+        public void Update(Question entity)
         {
-            _context.Sorular.Update(entity);
+            _context.Questions.Update(entity);
             _context.SaveChanges();
         }
     }

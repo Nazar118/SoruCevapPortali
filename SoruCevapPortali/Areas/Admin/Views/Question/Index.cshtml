@@ -1,0 +1,86 @@
+﻿@model IEnumerable<SoruCevapPortali.Models.Question>
+
+@{
+    ViewData["Title"] = "Soru Listesi";
+}
+
+<h1>Soru Yönetimi</h1>
+@Html.AntiForgeryToken() 
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Başlık</th>
+                        <th>Soruyu Soran</th>
+                        <th>Oluşturma Tarihi</th>
+                        <th>Durum (Onay)</th>
+                        <th>Düzenle</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var soru in Model)
+                    {
+                        <tr>
+                            <td>@soru.Id</td>
+                            <td>@soru.title</td>
+                            <td>@(soru.User?.User_name ?? "Bilinmiyor")</td>
+                            <td>@soru.creation_date.ToShortDateString()</td>
+                            <td>
+                                <button class="btn btn-sm toggle-onay-btn @(soru.Is_ıt_approved ? "btn-success" : "btn-warning")" data-id="@soru.Id">
+                                    @(soru.Is_ıt_approved ? "Onaylandı" : "Beklemede")
+                                </button>
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@soru.Id" class="btn btn-primary btn-sm">Düzenle</a>
+                            <td>
+                                <form asp-action="Delete" asp-route-id="@soru.Id" method="post" onsubmit="return confirm('Bu soruyu silmek istediğinizden emin misiniz?');">
+                                    <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.toggle-onay-btn').click(function () {
+                var button = $(this);
+                var soruId = button.data('id');
+
+                $.ajax({
+                    url: '/Admin/Soru/ToggleOnay', // GİDECEĞİ ADRES
+                    type: 'POST',
+                    data: { id: soruId },
+                    headers: {
+                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // Dönen cevaba göre butonu güncelle
+                            if (response.isOnayli) {
+                                button.removeClass('btn-warning').addClass('btn-success').text('Onaylandı');
+                            } else {
+                                button.removeClass('btn-success').addClass('btn-warning').text('Beklemede');
+                            }
+                        } else {
+                            alert("Bir hata oluştu!");
+                        }
+                    },
+                    error: function () {
+                        alert("Sunucuyla iletişim kurulamadı!");
+                    }
+                });
+            });
+        });
+    </script>
+}
