@@ -8,9 +8,9 @@ namespace SoruCevapPortali.Models
 
         [Required(ErrorMessage = "Kategori adı zorunludur.")]
         [StringLength(100, ErrorMessage = "Kategori adı en fazla 100 karakter olabilir.")]
-        public string name { get; set; }
+        public string Name { get; set; }
 
         // Bir kategorinin birden çok sorusu olabileceğini belirtiyoruz.
-        public virtual ICollection<Question>? Sorular { get; set; }
+        public virtual ICollection<Question>? Question { get; set; }
     }
 }

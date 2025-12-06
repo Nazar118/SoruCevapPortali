@@ -5,7 +5,9 @@
 }
 
 <h1>Cevap Yönetimi</h1>
-@Html.AntiForgeryToken() <div class="card shadow mb-4">
+@Html.AntiForgeryToken()
+
+<div class="card shadow mb-4">
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -21,23 +23,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var cevap in Model)
+                    @foreach (var answer in Model)
                     {
                         <tr>
-                            <td>@cevap.Id</td>
-                            <td>@cevap.contents</td>
-                            <td>@(cevap.User?.User_name ?? "Bilinmiyor")</td>
-                            <td>@(cevap.Question?.title ?? "Bilinmiyor")</td>
-                            <td>@cevap.creation_date.ToShortDateString()</td>
+                            <td>@answer.Id</td>
+                            <td>@answer.contents</td>
+                            <td>@(answer.User?.User_name ?? "Bilinmiyor")</td>
+                            <td>@(answer.Question?.title ?? "Bilinmiyor")</td>
+                            <td>@answer.creation_date.ToShortDateString()</td>
 
                             <td>
-                                <button class="btn btn-sm toggle-best-btn @(cevap.Is_it_the_best_answer ? "btn-success" : "btn-secondary")" data-id="@cevap.Id">
-                                    @(cevap.Is_it_the_best_answer ? "Evet (En İyi)" : "İşaretle")
+                                <button class="btn btn-sm toggle-best-btn @(answer.IsBestAnswer ? "btn-success" : "btn-secondary")" data-id="@answer.Id">
+                                    @(answer.IsBestAnswer ? "Evet (En İyi)" : "İşaretle")
                                 </button>
                             </td>
 
                             <td>
-                                <form asp-action="Delete" asp-route-id="@cevap.Id" method="post" onsubmit="return confirm('Bu cevabı silmek istediğinizden emin misiniz?');">
+                                <form asp-action="Delete" asp-route-id="@answer.Id" method="post" onsubmit="return confirm('Bu cevabı silmek istediğinizden emin misiniz?');">
                                     <button type="submit" class="btn btn-danger btn-sm">Sil</button>
                                 </form>
                             </td>
@@ -54,28 +56,27 @@
         $(document).ready(function () {
             $('.toggle-best-btn').click(function () {
                 var clickedButton = $(this);
-                var cevapId = clickedButton.data('id');
+                var answerId = clickedButton.data('id');
 
                 $.ajax({
-                    url: '/Admin/Cevap/ToggleBestAnswer',
+                    // DOĞRU ADRES: /Admin/Answer/ToggleBestAnswer
+                    url: '/Admin/Answer/ToggleBestAnswer',
                     type: 'POST',
-                    data: { id: cevapId },
+                    data: { id: answerId },
                     headers: {
                         "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
                     },
                     success: function (response) {
                         if (response.success) {
-                            // Controller'dan o soruya ait tüm cevapların listesi geldi.
-                            // Şimdi sayfadaki tüm butonları bu listeye göre güncelleyelim.
-                            response.updatedAnswers.forEach(function(answer) {
+                            // Controller'dan gelen liste ile butonları güncelle
+                            response.updatedAnswers.forEach(function(item) {
 
-                                // Sayfadaki o cevaba ait butonu bul
-                                var buttonToUpdate = $('.toggle-best-btn[data-id="' + answer.id + '"]');
+                                var btn = $('.toggle-best-btn[data-id="' + item.id + '"]');
 
-                                if (answer.isBest) {
-                                    buttonToUpdate.removeClass('btn-secondary').addClass('btn-success').text('Evet (En İyi)');
+                                if (item.isBest) {
+                                    btn.removeClass('btn-secondary').addClass('btn-success').text('Evet (En İyi)');
                                 } else {
-                                    buttonToUpdate.removeClass('btn-success').addClass('btn-secondary').text('İşaretle');
+                                    btn.removeClass('btn-success').addClass('btn-secondary').text('İşaretle');
                                 }
                             });
                         } else {

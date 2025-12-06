@@ -22,11 +22,9 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            // İŞTE DÜZELTME BURADA!
-            // Artık Türkçe isimleri değil, Adım 1'de yazdığımız İngilizce isimleri kullanıyoruz.
             var answers = _context.Answers
-                            .Include(c => c.User)      // Eskiden: .Include(c => c.CevaplayanKullanici)
-                            .Include(c => c.Question)  // Eskiden: .Include(c => c.AitOlduguSoru)
+                            .Include(c => c.User)
+                            .Include(c => c.Question)
                             .ToList();
             return View(answers);
         }
@@ -43,34 +41,37 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // --- İŞTE KRİTİK METOT: ToggleBestAnswer ---
         [HttpPost]
         public IActionResult ToggleBestAnswer(int id)
         {
+            // Tablo adı 'Answers' olmalı (S takısına dikkat!)
             var answer = _context.Answers.Find(id);
             if (answer == null) return NotFound();
 
-            bool wasBest = answer.Is_it_the_best_answer;
-            answer.Is_it_the_best_answer = !wasBest;
+            // Durumu tersine çevir
+            bool wasBest = answer.IsBestAnswer; // Modelde adı 'IsBestAnswer' olmalı
+            answer.IsBestAnswer = !wasBest;
 
-            if (answer.Is_it_the_best_answer)
+            // Eğer "En İyi" olarak işaretleniyorsa, diğerlerinin işaretini kaldır
+            if (answer.IsBestAnswer)
             {
-                // BURADA DA QuestionId kullanıyoruz
                 var otherAnswers = _context.Answers
                     .Where(c => c.QuestionId == answer.QuestionId && c.Id != answer.Id)
                     .ToList();
 
                 foreach (var other in otherAnswers)
                 {
-                    other.Is_it_the_best_answer = false;
+                    other.IsBestAnswer = false;
                 }
             }
 
             _context.SaveChanges();
 
-            // BURADA DA QuestionId kullanıyoruz
+            // Güncellenmiş listeyi geri döndür
             var allAnswers = _context.Answers
                 .Where(c => c.QuestionId == answer.QuestionId)
-                .Select(c => new { id = c.Id, isBest = c.Is_it_the_best_answer })
+                .Select(c => new { id = c.Id, isBest = c.IsBestAnswer })
                 .ToList();
 
             return Json(new { success = true, updatedAnswers = allAnswers });

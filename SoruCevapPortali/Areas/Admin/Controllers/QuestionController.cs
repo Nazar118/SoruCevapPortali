@@ -53,7 +53,7 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
             // DÜZELTME: KategoriId -> CategoryId (Eğer modelde değiştirdiysen)
             // Eğer modelde hala KategoriId ise burayı KategoriId yap. 
             // Ama biz CategoryId yapmıştık diye hatırlıyorum.
-            ViewBag.Categories = new SelectList(_categoryRepository.GetAll(), "Id", "Ad", question.CategoryId);
+            ViewBag.Categories = new SelectList(_categoryRepository.GetAll(), "Id", "Name", question.CategoryId);
 
             return View(question);
         }
@@ -68,7 +68,7 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
             // DÜZELTME: KategoriId -> CategoryId
-            ViewBag.Categories = new SelectList(_categoryRepository.GetAll(), "Id", "Ad", question.CategoryId);
+            ViewBag.Categories = new SelectList(_categoryRepository.GetAll(), "Id", "Name", question.CategoryId);
             return View(question);
         }
 
@@ -78,10 +78,10 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
             var question = _questionRepository.GetById(id);
             if (question == null) return NotFound();
 
-            question.Is_ıt_approved = !question.Is_ıt_approved;
+            question.Is_it_approved = !question.Is_it_approved;
             _questionRepository.Update(question);
 
-            return Json(new { success = true, isOnayli = question.Is_ıt_approved });
+            return Json(new { success = true, isOnayli = question.Is_it_approved });
         }
     }
 }

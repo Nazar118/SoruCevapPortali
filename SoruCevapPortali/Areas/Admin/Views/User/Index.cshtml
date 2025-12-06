@@ -1,15 +1,11 @@
 ﻿@model IEnumerable<SoruCevapPortali.Models.User>
-
 @{
     ViewData["Title"] = "Kullanıcı Listesi";
 }
 
 <h1>Kullanıcı Yönetimi</h1>
 @Html.AntiForgeryToken()
-
-<p>
-    <a asp-action="Create" class="btn btn-primary">Yeni Kullanıcı Ekle</a>
-</p>
+<p><a asp-action="Create" class="btn btn-primary">Yeni Kullanıcı Ekle</a></p>
 
 <div class="card shadow mb-4">
     <div class="card-body">
@@ -22,31 +18,26 @@
                         <th>Email</th>
                         <th>Kayıt Tarihi</th>
                         <th>Durum</th>
-                        <th>Düzenle</th> @* <-- YENİ SÜTUN BAŞLIĞI *@
-                        <th>Sil</th>     @* <-- YENİ SÜTUN BAŞLIĞI *@
+                        <th>Düzenle</th>
+                        <th>Sil</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var kullanici in Model)
+                    @foreach (var user in Model)
                     {
                         <tr>
-                            <td>@kullanici.Id</td>
-                            <td>@kullanici.User_name</td>
-                            <td>@kullanici.Email</td>
-                            <td>@kullanici.registration_date.ToShortDateString()</td>
-
+                            <td>@user.Id</td>
+                            <td>@user.User_name</td>
+                            <td>@user.Email</td>
+                            <td>@user.registration_date.ToShortDateString()</td>
                             <td>
-                                <button class="btn btn-sm toggle-status-btn @(kullanici.Is_it_active ? "btn-success" : "btn-warning")" data-id="@kullanici.Id">
-                                    @(kullanici.Is_it_active ? "Aktif" : "Pasif")
+                                <button class="btn btn-sm toggle-status-btn @(user.Is_it_active ? "btn-success" : "btn-warning")" data-id="@user.Id">
+                                    @(user.Is_it_active ? "Aktif" : "Pasif")
                                 </button>
                             </td>
-
+                            <td><a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-success btn-sm">Düzenle</a></td>
                             <td>
-                                <a asp-action="Edit" asp-route-id="@kullanici.Id" class="btn btn-success btn-sm">Düzenle</a>
-                            </td>
-
-                            <td>
-                                <form asp-action="Delete" asp-route-id="@kullanici.Id" method="post" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?');">
+                                <form asp-action="Delete" asp-route-id="@user.Id" method="post" onsubmit="return confirm('Silmek istiyor musunuz?');">
                                     <button type="submit" class="btn btn-danger btn-sm">Sil</button>
                                 </form>
                             </td>
@@ -57,35 +48,28 @@
         </div>
     </div>
 </div>
-
 @section Scripts {
     <script>
         $(document).ready(function () {
             $('.toggle-status-btn').click(function () {
                 var button = $(this);
                 var userId = button.data('id');
-
                 $.ajax({
-                    url: '/Admin/Kullanici/ToggleStatus',
+                    url: '/Admin/User/ToggleStatus',
                     type: 'POST',
                     data: { id: userId },
-                    headers: {
-                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
-                    },
+                    headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() },
                     success: function (response) {
                         if (response.success) {
+                            // Controller'dan dönen veriyi de güncelleyeceğiz
                             if (response.isActive) {
                                 button.removeClass('btn-warning').addClass('btn-success').text('Aktif');
                             } else {
                                 button.removeClass('btn-success').addClass('btn-warning').text('Pasif');
                             }
-                        } else {
-                            alert("Bir hata oluştu!");
-                        }
+                        } else { alert("Hata oluştu!"); }
                     },
-                    error: function () {
-                        alert("Sunucuyla iletişim kurulamadı!");
-                    }
+                    error: function () { alert("Sunucu hatası!"); }
                 });
             });
         });

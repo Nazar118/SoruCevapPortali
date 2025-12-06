@@ -20,15 +20,16 @@ namespace SoruCevapPortali.Controllers
         // Burasý sitenin ana sayfasý olacak (örn: https://localhost:7163/)
         public IActionResult Index()
         {
-            var sorular = _context.Questions
+            var question
+                = _context.Questions
                                   .Include(s => s.User)
                                   .Include(s => s.Answers)
                                   .Include(s => s.Category)
-                                  .Where(s => s.Is_ýt_approved == true) // Sadece onaylý sorular
+                                  .Where(s => s.Is_it_approved == true) // Sadece onaylý sorular
                                   .OrderByDescending(s => s.creation_date)
                                   .ToList();
 
-            return View(sorular); // Modeli View'a gönder
+            return View(question); // Modeli View'a gönder
         }
 
         public IActionResult Privacy()

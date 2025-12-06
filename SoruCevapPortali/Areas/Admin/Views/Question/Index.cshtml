@@ -23,22 +23,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var soru in Model)
+                    @foreach (var question in Model)
                     {
                         <tr>
-                            <td>@soru.Id</td>
-                            <td>@soru.title</td>
-                            <td>@(soru.User?.User_name ?? "Bilinmiyor")</td>
-                            <td>@soru.creation_date.ToShortDateString()</td>
+                            <td>@question.Id</td>
+                            <td>@question.title</td>
+                            <td>@(question.User?.User_name ?? "Bilinmiyor")</td>
+                            <td>@question.creation_date.ToShortDateString()</td>
                             <td>
-                                <button class="btn btn-sm toggle-onay-btn @(soru.Is_ıt_approved ? "btn-success" : "btn-warning")" data-id="@soru.Id">
-                                    @(soru.Is_ıt_approved ? "Onaylandı" : "Beklemede")
+                                <button class="btn btn-sm toggle-onay-btn @(question.Is_it_approved ? "btn-success" : "btn-warning")" data-id="@question.Id">
+                                    @(question.Is_it_approved ? "Onaylandı" : "Beklemede")
                                 </button>
                             </td>
                             <td>
-                                <a asp-action="Edit" asp-route-id="@soru.Id" class="btn btn-primary btn-sm">Düzenle</a>
+                                <a asp-action="Edit" asp-route-id="@question.Id" class="btn btn-primary btn-sm">Düzenle</a>
                             <td>
-                                <form asp-action="Delete" asp-route-id="@soru.Id" method="post" onsubmit="return confirm('Bu soruyu silmek istediğinizden emin misiniz?');">
+                                <form asp-action="Delete" asp-route-id="@question.Id" method="post" onsubmit="return confirm('Bu soruyu silmek istediğinizden emin misiniz?');">
                                     <button type="submit" class="btn btn-danger btn-sm">Sil</button>
                                 </form>
                             </td>
@@ -58,7 +58,7 @@
                 var soruId = button.data('id');
 
                 $.ajax({
-                    url: '/Admin/Soru/ToggleOnay', // GİDECEĞİ ADRES
+                    url: '/Admin/Question/ToggleOnay', // GİDECEĞİ ADRES
                     type: 'POST',
                     data: { id: soruId },
                     headers: {

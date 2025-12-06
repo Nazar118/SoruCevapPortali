@@ -7,19 +7,18 @@ namespace SoruCevapPortali.Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Content is required.")] // Mesajları da İngilizce yapabiliriz veya Türkçe kalabilir
-        public string contents { get; set; } // Icerik -> Content yapabiliriz ama şimdilik Icerik kalsın, karışmasın.
+        [Required]
+        public string contents { get; set; } // SQL: contents
 
-        public DateTime creation_date { get; set; }
-        public bool Is_it_the_best_answer { get; set; }
+        public DateTime creation_date { get; set; } // SQL: creation_date
+        public bool IsBestAnswer { get; set; }      // SQL: IsBestAnswer (Bu doğruydu)
 
-        // --- İŞTE BURALARI İNGİLİZCELEŞTİRİYORUZ ---
-        public int UserId { get; set; } // Eskiden KullaniciId
+        public int UserId { get; set; }
         [ForeignKey("UserId")]
-        public virtual User? User { get; set; } // Eskiden CevaplayanKullanici
+        public virtual User? User { get; set; }
 
-        public int QuestionId { get; set; } // Eskiden SoruId
+        public int QuestionId { get; set; }
         [ForeignKey("QuestionId")]
-        public virtual Question? Question { get; set; } // Eskiden AitOlduguSoru
+        public virtual Question? Question { get; set; }
     }
 }

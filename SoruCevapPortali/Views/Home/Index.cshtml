@@ -17,18 +17,23 @@
 
         @if (Model != null && Model.Any())
         {
-            foreach (var soru in Model)
+            // DÜZELTME: Değişken adını 'question' yaptık
+            foreach (var question in Model)
             {
                 <div class="card mb-3">
                     <div class="card-body">
-                        <h5 class="card-title">@soru.title</h5>
-                        <p class="card-text">@soru.contents</p>
+                        <h5 class="card-title">@question.title</h5>
+
+                        <p class="card-text">@question.contents</p>
                     </div>
                     <div class="card-footer text-muted">
-                        <span class="badge badge-info" style="font-size: 0.9rem;">@soru.Category?.name</span> ·
-                        <strong>@soru.Answers.Count()</strong> cevap ·
-                        @soru.User?.User_name tarafından
-                        @soru.creation_date.ToShortDateString() tarihinde soruldu.
+                        <span class="badge badge-info" style="font-size: 0.9rem;">@question.Category?.Name</span> ·
+
+                        <strong>@question.Answers.Count()</strong> cevap ·
+
+                        @question.User?.User_name tarafından
+
+                        @question.creation_date.ToShortDateString() tarihinde soruldu.
                     </div>
                 </div>
             }

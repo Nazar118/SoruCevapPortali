@@ -8,23 +8,22 @@ namespace SoruCevapPortali.Models
         public int Id { get; set; }
 
         [Required]
-        public string title { get; set; }
+        public string title { get; set; }    // SQL: title
 
         [Required]
-        public string contents { get; set; }
+        public string contents { get; set; } // SQL: contents
 
-        public int? CategoryId { get; set; } // Eskiden KategoriId
+        public int? CategoryId { get; set; }
         [ForeignKey("CategoryId")]
-        public virtual Category? Category { get; set; } // Eskiden Kategori
+        public virtual Category? Category { get; set; }
 
-        public DateTime creation_date { get; set; }
-        public bool Is_ıt_approved { get; set; }
+        public DateTime creation_date { get; set; } // SQL: creation_date
+        public bool Is_it_approved { get; set; }    // SQL: Is_it_approved
 
-        // --- İŞTE BURALARI İNGİLİZCELEŞTİRİYORUZ ---
-        public int UserId { get; set; } // Eskiden KullaniciId
+        public int UserId { get; set; }
         [ForeignKey("UserId")]
-        public virtual User? User { get; set; } // Eskiden SoranKullanici
+        public virtual User? User { get; set; }
 
-        public virtual ICollection<Answer>? Answers { get; set; } // Eskiden Cevaplar
+        public virtual ICollection<Answer>? Answers { get; set; }
     }
 }
