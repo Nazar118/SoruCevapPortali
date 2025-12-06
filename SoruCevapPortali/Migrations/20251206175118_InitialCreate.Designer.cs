@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SoruCevapPortali.Data;
 
@@ -11,9 +12,11 @@ using SoruCevapPortali.Data;
 namespace SoruCevapPortali.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251206175118_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -131,21 +134,21 @@ namespace SoruCevapPortali.Migrations
                     b.Property<int?>("AnswerId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsResolved")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("QuestionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("creation_date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("is_resolved")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("reason")
+                    b.Property<string>("Reason")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ReporterId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -153,7 +156,7 @@ namespace SoruCevapPortali.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ReporterId");
 
                     b.ToTable("Reports");
                 });
@@ -250,7 +253,7 @@ namespace SoruCevapPortali.Migrations
 
                     b.HasOne("SoruCevapPortali.Models.User", "Reporter")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("ReporterId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

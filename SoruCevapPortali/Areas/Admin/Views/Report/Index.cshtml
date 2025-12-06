@@ -1,0 +1,90 @@
+﻿@model IEnumerable<SoruCevapPortali.Models.Report>
+@{
+    ViewData["Title"] = "Rapor Yönetimi";
+}
+
+<h1>Rapor Yönetimi</h1>
+@Html.AntiForgeryToken()
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Raporlayan</th>
+                        <th>Sebep</th>
+                        <th>Tür</th>
+                        <th>İçerik Özeti</th>
+                        <th>Tarih</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@(item.Reporter?.User_name ?? "Bilinmiyor")</td>
+                            <td>@item.reason</td>
+
+                            <td>
+                                @if (item.QuestionId != null)
+                                {
+                                    <span class="badge badge-primary">Soru</span>
+                                }
+                                else if (item.AnswerId != null)
+                                {
+
+                                    <span class="badge badge-info">Cevap</span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (item.Question != null)
+                                {
+                                    @item.Question.title.Substring(0, Math.Min(item.Question.title.Length, 30))
+                                }
+                                else if (item.Answer != null)
+                                {
+                                    @item.Answer.contents.Substring(0, Math.Min(item.Answer.contents.Length, 30))
+                                }
+                                else
+                                {
+
+                                    <span class="text-danger">İçerik Silinmiş</span>
+                                }
+                            </td>
+
+                            <td>@item.creation_date.ToShortDateString()</td>
+
+                            <td>
+                                @if (item.is_resolved)
+                                {
+                                    <span class="badge badge-success">İncelendi</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge badge-warning">Bekliyor</span>
+                                }
+                            </td>
+
+                            <td>
+                                <form asp-action="DeleteContent" asp-route-reportId="@item.Id" method="post" onsubmit="return confirm('Şikayet edilen BU İÇERİĞİ kalıcı olarak silmek istediğinize emin misiniz?');" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">İçeriği Sil</button>
+                                </form>
+
+                                <form asp-action="MarkAsResolved" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-secondary btn-sm">
+                                        @(item.is_resolved ? "Geri Al" : "Tamamlandı İşaretle")
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -12,8 +12,8 @@ using SoruCevapPortali.Data;
 namespace SoruCevapPortali.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251127152155_YeniBaslangic")]
-    partial class YeniBaslangic
+    [Migration("20251206191600_AddReportTable")]
+    partial class AddReportTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,7 +33,7 @@ namespace SoruCevapPortali.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("Is_it_the_best_answer")
+                    b.Property<bool>("IsBestAnswer")
                         .HasColumnType("bit");
 
                     b.Property<int>("QuestionId")
@@ -71,7 +71,7 @@ namespace SoruCevapPortali.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("name")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -92,7 +92,7 @@ namespace SoruCevapPortali.Migrations
                     b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Is_ıt_approved")
+                    b.Property<bool>("Is_it_approved")
                         .HasColumnType("bit");
 
                     b.Property<int>("UserId")
@@ -123,6 +123,44 @@ namespace SoruCevapPortali.Migrations
                     b.ToTable("Questions");
                 });
 
+            modelBuilder.Entity("SoruCevapPortali.Models.Report", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AnswerId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("creation_date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("is_resolved")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnswerId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Reports");
+                });
+
             modelBuilder.Entity("SoruCevapPortali.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -145,6 +183,9 @@ namespace SoruCevapPortali.Migrations
                     b.Property<string>("User_name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WarningCount")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("registration_date")
                         .HasColumnType("datetime2");
@@ -169,7 +210,7 @@ namespace SoruCevapPortali.Migrations
                         .IsRequired();
 
                     b.HasOne("SoruCevapPortali.Models.User", null)
-                        .WithMany("Cevaplar")
+                        .WithMany("Answers")
                         .HasForeignKey("UserId1");
 
                     b.Navigation("Question");
@@ -180,7 +221,7 @@ namespace SoruCevapPortali.Migrations
             modelBuilder.Entity("SoruCevapPortali.Models.Question", b =>
                 {
                     b.HasOne("SoruCevapPortali.Models.Category", "Category")
-                        .WithMany("Sorular")
+                        .WithMany("Question")
                         .HasForeignKey("CategoryId");
 
                     b.HasOne("SoruCevapPortali.Models.User", "User")
@@ -190,7 +231,7 @@ namespace SoruCevapPortali.Migrations
                         .IsRequired();
 
                     b.HasOne("SoruCevapPortali.Models.User", null)
-                        .WithMany("Sorular")
+                        .WithMany("Questions")
                         .HasForeignKey("UserId1");
 
                     b.Navigation("Category");
@@ -198,9 +239,34 @@ namespace SoruCevapPortali.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SoruCevapPortali.Models.Report", b =>
+                {
+                    b.HasOne("SoruCevapPortali.Models.Answer", "Answer")
+                        .WithMany()
+                        .HasForeignKey("AnswerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SoruCevapPortali.Models.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SoruCevapPortali.Models.User", "Reporter")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Answer");
+
+                    b.Navigation("Question");
+
+                    b.Navigation("Reporter");
+                });
+
             modelBuilder.Entity("SoruCevapPortali.Models.Category", b =>
                 {
-                    b.Navigation("Sorular");
+                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("SoruCevapPortali.Models.Question", b =>
@@ -210,9 +276,9 @@ namespace SoruCevapPortali.Migrations
 
             modelBuilder.Entity("SoruCevapPortali.Models.User", b =>
                 {
-                    b.Navigation("Cevaplar");
+                    b.Navigation("Answers");
 
-                    b.Navigation("Sorular");
+                    b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
         }

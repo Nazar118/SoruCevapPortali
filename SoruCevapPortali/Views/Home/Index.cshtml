@@ -34,6 +34,13 @@
                         @question.User?.User_name tarafından
 
                         @question.creation_date.ToShortDateString() tarihinde soruldu.
+                        @question.creation_date.ToShortDateString() tarihinde soruldu.
+
+                        <button class="btn btn-sm btn-outline-danger float-right report-btn"
+                                data-type="question"
+                                data-id="@question.Id">
+                            🚩 Şikayet Et
+                        </button>
                     </div>
                 </div>
             }
@@ -46,3 +53,93 @@
         }
     </div>
 </div>
+
+<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reportModalLabel">İçeriği Şikayet Et</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="reportForm">
+                    <input type="hidden" id="reportQuestionId" name="questionId" />
+                    <input type="hidden" id="reportAnswerId" name="answerId" />
+
+                    <div class="form-group">
+                        <label for="reportReason">Şikayet Sebebi:</label>
+                        <textarea class="form-control" id="reportReason" name="reason" rows="3" placeholder="Lütfen sebebi belirtin..." required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" id="submitReport">Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // "Şikayet Et" butonuna basılınca
+            $('.report-btn').click(function () {
+                var type = $(this).data('type'); // "question" mı "answer" mı?
+                var id = $(this).data('id');     // ID kaç?
+
+                // Önceki verileri temizle
+                $('#reportQuestionId').val('');
+                $('#reportAnswerId').val('');
+                $('#reportReason').val('');
+
+                // ID'yi doğru kutucuğa koy
+                if (type === 'question') {
+                    $('#reportQuestionId').val(id);
+                } else {
+                    $('#reportAnswerId').val(id);
+                }
+
+                // Modalı aç
+                $('#reportModal').modal('show');
+            });
+
+            // Modaldaki "Gönder" butonuna basılınca
+            $('#submitReport').click(function () {
+                var reason = $('#reportReason').val();
+                if (!reason) {
+                    alert("Lütfen bir sebep yazın.");
+                    return;
+                }
+
+                var formData = {
+                    questionId: $('#reportQuestionId').val(),
+                    answerId: $('#reportAnswerId').val(),
+                    reason: reason
+                };
+
+                $.ajax({
+                    url: '/Report/Create',
+                    type: 'POST',
+                    data: formData,
+                    headers: {
+                        // AntiForgeryToken'ı sayfanın herhangi bir yerinden bulup alıyoruz
+                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response) {
+                        $('#reportModal').modal('hide'); // Modalı kapat
+                        if (response.success) {
+                            alert(response.message);
+                        } else {
+                            alert("Hata: " + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Sunucuyla iletişim kurulamadı.");
+                    }
+                });
+            });
+        });
+    </script>
+}
