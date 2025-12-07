@@ -19,15 +19,25 @@
                         <th>Ait Olduğu Soru</th>
                         <th>Tarih</th>
                         <th>En İyi Cevap?</th>
-                        <th>İşlemler</th>
-                    </tr>
+                        <th>İşlemler</th> </tr>
                 </thead>
                 <tbody>
                     @foreach (var answer in Model)
                     {
                         <tr>
                             <td>@answer.Id</td>
-                            <td>@answer.contents</td>
+                            
+                            <td>
+                                @if (answer.contents != null && answer.contents.Length > 50)
+                                {
+                                    @answer.contents.Substring(0, 50) <span>...</span>
+                                }
+                                else
+                                {
+                                    @answer.contents
+                                }
+                            </td>
+                            
                             <td>@(answer.User?.User_name ?? "Bilinmiyor")</td>
                             <td>@(answer.Question?.title ?? "Bilinmiyor")</td>
                             <td>@answer.creation_date.ToShortDateString()</td>
@@ -38,10 +48,18 @@
                                 </button>
                             </td>
 
-                            <td>
-                                <form asp-action="Delete" asp-route-id="@answer.Id" method="post" onsubmit="return confirm('Bu cevabı silmek istediğinizden emin misiniz?');">
-                                    <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                            <td class="text-nowrap" style="width: 150px;"> 
+                                
+                                <a asp-action="Edit" asp-route-id="@answer.Id" class="btn btn-warning btn-sm mr-1">
+                                    <i class="fas fa-edit"></i> Düzenle
+                                </a>
+
+                                <form asp-action="Delete" asp-route-id="@answer.Id" method="post" onsubmit="return confirm('Bu cevabı silmek istediğinizden emin misiniz?');" style="display:inline-block;">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i> Sil
+                                    </button>
                                 </form>
+
                             </td>
                         </tr>
                     }
@@ -52,42 +70,38 @@
 </div>
 
 @section Scripts {
-    <script>
-        $(document).ready(function () {
-            $('.toggle-best-btn').click(function () {
-                var clickedButton = $(this);
-                var answerId = clickedButton.data('id');
+<script>
+    $(document).ready(function () {
+        $('.toggle-best-btn').click(function () {
+            var clickedButton = $(this);
+            var answerId = clickedButton.data('id');
 
-                $.ajax({
-                    // DOĞRU ADRES: /Admin/Answer/ToggleBestAnswer
-                    url: '/Admin/Answer/ToggleBestAnswer',
-                    type: 'POST',
-                    data: { id: answerId },
-                    headers: {
-                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            // Controller'dan gelen liste ile butonları güncelle
-                            response.updatedAnswers.forEach(function(item) {
-
-                                var btn = $('.toggle-best-btn[data-id="' + item.id + '"]');
-
-                                if (item.isBest) {
-                                    btn.removeClass('btn-secondary').addClass('btn-success').text('Evet (En İyi)');
-                                } else {
-                                    btn.removeClass('btn-success').addClass('btn-secondary').text('İşaretle');
-                                }
-                            });
-                        } else {
-                            alert("Bir hata oluştu!");
-                        }
-                    },
-                    error: function () {
-                        alert("Sunucuyla iletişim kurulamadı!");
+            $.ajax({
+                url: '/Admin/Answer/ToggleBestAnswer',
+                type: 'POST',
+                data: { id: answerId },
+                headers: {
+                    "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (response) {
+                    if (response.success) {
+                        response.updatedAnswers.forEach(function(item) {
+                            var btn = $('.toggle-best-btn[data-id="' + item.id + '"]');
+                            if (item.isBest) {
+                                btn.removeClass('btn-secondary').addClass('btn-success').text('Evet (En İyi)');
+                            } else {
+                                btn.removeClass('btn-success').addClass('btn-secondary').text('İşaretle');
+                            }
+                        });
+                    } else {
+                        alert("Bir hata oluştu!");
                     }
-                });
+                },
+                error: function () {
+                    alert("Sunucuyla iletişim kurulamadı!");
+                }
             });
         });
-    </script>
+    });
+</script>
 }

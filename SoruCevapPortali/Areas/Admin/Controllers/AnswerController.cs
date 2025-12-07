@@ -29,6 +29,55 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
             return View(answers);
         }
 
+        // ==========================================================
+        // ===== YENİ EKLENEN EDIT (DÜZENLEME) METOTLARI =====
+        // ==========================================================
+
+        // 1. Düzenleme Sayfasını Aç (GET)
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var answer = _answerRepository.GetById(id);
+            if (answer == null)
+            {
+                return NotFound();
+            }
+
+            // Hangi soruya ait olduğunu View'da göstermek için Viewbag'e atalım
+            ViewBag.QuestionId = answer.QuestionId;
+
+            return View(answer);
+        }
+
+        // 2. Düzenlemeyi Kaydet (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Answer answer)
+        {
+            if (ModelState.IsValid)
+            {
+                // Veritabanından orijinal kaydı çekiyoruz
+                var existingAnswer = _answerRepository.GetById(answer.Id);
+
+                if (existingAnswer == null)
+                {
+                    return NotFound();
+                }
+
+                // Sadece değişmesine izin verdiğimiz alanları güncelliyoruz.
+                // Böylece UserId, QuestionId, creation_date gibi alanlar bozulmaz.
+                existingAnswer.contents = answer.contents;
+                existingAnswer.IsBestAnswer = answer.IsBestAnswer;
+
+                _answerRepository.Update(existingAnswer);
+
+                return RedirectToAction(nameof(Index));
+            }
+            return View(answer);
+        }
+        // ==========================================================
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
@@ -41,19 +90,15 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // --- İŞTE KRİTİK METOT: ToggleBestAnswer ---
         [HttpPost]
         public IActionResult ToggleBestAnswer(int id)
         {
-            // Tablo adı 'Answers' olmalı (S takısına dikkat!)
             var answer = _context.Answers.Find(id);
             if (answer == null) return NotFound();
 
-            // Durumu tersine çevir
-            bool wasBest = answer.IsBestAnswer; // Modelde adı 'IsBestAnswer' olmalı
+            bool wasBest = answer.IsBestAnswer;
             answer.IsBestAnswer = !wasBest;
 
-            // Eğer "En İyi" olarak işaretleniyorsa, diğerlerinin işaretini kaldır
             if (answer.IsBestAnswer)
             {
                 var otherAnswers = _context.Answers
@@ -68,7 +113,6 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
 
             _context.SaveChanges();
 
-            // Güncellenmiş listeyi geri döndür
             var allAnswers = _context.Answers
                 .Where(c => c.QuestionId == answer.QuestionId)
                 .Select(c => new { id = c.Id, isBest = c.IsBestAnswer })

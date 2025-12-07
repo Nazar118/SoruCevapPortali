@@ -20,30 +20,44 @@ namespace SoruCevapPortali.Controllers
         [ValidateAntiForgeryToken] // Güvenlik için şart
         public IActionResult Create(int? questionId, int? answerId, string reason)
         {
-            // Kullanıcı giriş yapmış mı?
+            // 1. GÜVENLİK KONTROLÜ: Kullanıcı giriş yapmış mı?
             if (!User.Identity.IsAuthenticated)
             {
-                return Json(new { success = false, message = "Şikayet etmek için giriş yapmalısınız." });
+                // 401 (Yetkisiz) Hatası döndürür
+                return Unauthorized(new { success = false, message = "Şikayet etmek için giriş yapmalısınız." });
             }
 
-            // Giriş yapan kullanıcının ID'sini bul
+            // 2. KULLANICI ID ALMA (Daha Güvenli Yöntem)
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("UserId");
-            if (string.IsNullOrEmpty(userIdStr)) return Json(new { success = false, message = "Kullanıcı bulunamadı." });
 
-            int reporterId = int.Parse(userIdStr);
+            // int.Parse yerine int.TryParse kullanıyoruz ki hata olursa çökmesin
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int reporterId))
+            {
+                return BadRequest(new { success = false, message = "Kullanıcı bilgisi alınamadı. Lütfen çıkış yapıp tekrar girin." });
+            }
 
+            // 3. MODEL OLUŞTURMA (Senin SQL İsimlerine Göre)
             var report = new Report
             {
-                UserId = reporterId, // ReporterId DEĞİL, UserId
-                reason = reason,     // Reason DEĞİL, reason
+                UserId = reporterId,          // SQL: UserId
+                reason = reason,              // SQL: reason
                 QuestionId = questionId,
                 AnswerId = answerId,
-                creation_date = DateTime.Now, // CreatedAt DEĞİL
-                is_resolved = false           // IsResolved DEĞİL
+                creation_date = DateTime.Now, // SQL: creation_date
+                is_resolved = false           // SQL: is_resolved
             };
-            _reportRepository.Add(report);
 
-            return Json(new { success = true, message = "Şikayetiniz alındı. Teşekkürler." });
+            // 4. VERİTABANI KAYDI (Hata Yakalamalı - Try/Catch)
+            try
+            {
+                _reportRepository.Add(report);
+                return Json(new { success = true, message = "Şikayetiniz alındı. Teşekkürler." });
+            }
+            catch (Exception ex)
+            {
+                // Hata oluşursa sunucuyu çökertme, hatayı yakala ve mesaj olarak dön
+                return StatusCode(500, new { success = false, message = "Kaydedilirken bir hata oluştu." });
+            }
         }
     }
 }

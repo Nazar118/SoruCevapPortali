@@ -1,0 +1,38 @@
+﻿@model SoruCevapPortali.Models.Answer
+
+@{
+    ViewData["Title"] = "Cevap Düzenle";
+}
+
+<h1>Cevap Düzenle</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="QuestionId" />
+            <input type="hidden" asp-for="creation_date" />
+
+            <div class="form-group">
+                <label asp-for="contents" class="control-label">Cevap İçeriği</label>
+                <textarea asp-for="contents" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="contents" class="text-danger"></span>
+            </div>
+
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsBestAnswer" /> @Html.DisplayNameFor(model => model.IsBestAnswer)
+                </label>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Kaydet" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+            </div>
+        </form>
+    </div>
+</div>

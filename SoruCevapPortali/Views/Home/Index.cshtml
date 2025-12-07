@@ -65,6 +65,7 @@
             </div>
             <div class="modal-body">
                 <form id="reportForm">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" id="reportQuestionId" name="questionId" />
                     <input type="hidden" id="reportAnswerId" name="answerId" />
 
