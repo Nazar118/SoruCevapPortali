@@ -20,7 +20,7 @@ namespace SoruCevapPortali.Controllers
         // Burasý sitenin ana sayfasý olacak (örn: https://localhost:7163/)
         public IActionResult Index()
         {
-            var question
+            var Questions
                 = _context.Questions
                                   .Include(s => s.User)
                                   .Include(s => s.Answers)
@@ -29,7 +29,7 @@ namespace SoruCevapPortali.Controllers
                                   .OrderByDescending(s => s.creation_date)
                                   .ToList();
 
-            return View(question); // Modeli View'a gönder
+            return View(Questions); // Modeli View'a gönder
         }
 
         public IActionResult Privacy()
