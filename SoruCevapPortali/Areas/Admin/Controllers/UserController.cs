@@ -108,5 +108,67 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
 
             return Json(new { success = true, isActive = user.Is_it_active });
         }
+
+        // ==========================================================
+        // ===== YENİDEN EKLENEN PROFİL METOTLARI =====
+        // ==========================================================
+
+        // 1. Profil Sayfasını Aç (GET)
+        [HttpGet]
+        public IActionResult Profile()
+        {
+            // Giriş yapan kullanıcının adını al (User.Identity.Name)
+            var currentUserName = User.Identity.Name;
+
+            // Veritabanından bu kullanıcıyı bul
+            // ama repository yapımızda özel sorgu yoksa GetAll() ile filtreleriz.
+            var user = _userRepository.GetAll().FirstOrDefault(u => u.User_name == currentUserName);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
+        }
+
+        // 2. Profil Güncellemesini Kaydet (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Profile(User user)
+        {
+            // Burada kullanıcının kendi ID'sini değiştirmesini engellemek için
+            // formdan gelen ID ile veritabanındaki kaydı eşleştirelim.
+            var existingUser = _userRepository.GetById(user.Id);
+
+            if (existingUser == null)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                // Sadece izin verilen alanları güncelle
+                existingUser.Email = user.Email;
+
+                // Şifre değişikliği isteğe bağlı olabilir ama şimdilik direkt güncelliyoruz
+                // Gerçek bir projede "Eski Şifre" kontrolü yapılmalıdır.
+                existingUser.Password = user.Password;
+
+                // Kullanıcı adını değiştirmesine izin verelim mi? 
+                // Genelde giriş yapılan ismin değişmesi oturumu kapatabilir.
+                // Şimdilik izin verelim:
+                existingUser.User_name = user.User_name;
+
+                _userRepository.Update(existingUser);
+
+                // Başarılı mesajı göster (TempData ile)
+                TempData["SuccessMessage"] = "Profil bilgileriniz başarıyla güncellendi.";
+
+                return RedirectToAction(nameof(Profile)); // Sayfayı yenile
+            }
+
+            return View(user);
+        }
     }
 }

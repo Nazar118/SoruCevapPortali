@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using SoruCevapPortali.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace SoruCevapPortali.Areas.Admin.Controllers
@@ -18,44 +19,59 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            // 1. KARTLAR İÇİN TEMEL İSTATİSTİKLER
+            // 1. KART VERİLERİ
             ViewData["TotalQuestions"] = _context.Questions.Count();
             ViewData["TotalUsers"] = _context.Users.Count();
-            ViewData["PendingQuestions"] = _context.Questions.Count(q => !q.Is_it_approved); // Onaylanmamışlar
+            ViewData["TotalAnswers"] = _context.Answers.Count();
+            ViewData["PendingQuestionsCount"] = _context.Questions.Count(q => !q.Is_it_approved);
 
-            // 2. GRAFİK 1: KATEGORİ DAĞILIMI (Pasta Grafik)
-            // Kategorilere göre soru sayılarını grupla
-            var categoryData = _context.Questions
-                .GroupBy(q => q.Category.Name)
-                .Select(g => new { Category = g.Key, Count = g.Count() })
+            // 2. PASTA GRAFİK (Kategoriler)
+            var categoryData = _context.Categories
+                .Select(c => new { Name = c.Name, Count = c.Questions.Count() })
                 .ToList();
 
-            // Verileri iki ayrı diziye ayır (İsimler ve Sayılar) - Chart.js bu formatı sever
-            ViewBag.CategoryLabels = categoryData.Select(x => x.Category).ToArray();
-            ViewBag.CategoryCounts = categoryData.Select(x => x.Count).ToArray();
+            ViewBag.CatLabels = categoryData.Select(x => x.Name).ToArray();
+            ViewBag.CatCounts = categoryData.Select(x => x.Count).ToArray();
 
-
-            // 3. GRAFİK 2: HAFTALIK KULLANICI KAYITLARI (Çizgi Grafik)
-            // Son 7 günün tarihlerini al
+            // 3. ÇİZGİ GRAFİK (Haftalık Kayıtlar)
             var last7Days = Enumerable.Range(0, 7)
                 .Select(i => DateTime.Now.Date.AddDays(-i))
-                .OrderBy(d => d) // Tarihe göre sırala (Eskiden yeniye)
+                .OrderBy(d => d)
                 .ToList();
 
-            // Veritabanından son 7 günde kayıt olanları çek
-            var userSignups = _context.Users
+            var recentUsers = _context.Users
                 .Where(u => u.registration_date >= DateTime.Now.Date.AddDays(-7))
-                .ToList(); // Önce belleğe çekelim, sonra işleyelim (Daha güvenli)
+                .ToList();
 
-            // Her gün için kayıt sayısını hesapla
-            var signupCounts = last7Days.Select(date =>
-                userSignups.Count(u => u.registration_date.Date == date)
+            var userCounts = last7Days.Select(date =>
+                recentUsers.Count(u => u.registration_date.Date == date)
             ).ToArray();
 
-            var dateLabels = last7Days.Select(d => d.ToString("dd MMM")).ToArray(); // "12 Dec" gibi format
+            ViewBag.UserDates = last7Days.Select(d => d.ToString("dd MMM")).ToArray();
+            ViewBag.UserCounts = userCounts;
 
-            ViewBag.UserSignupLabels = dateLabels;
-            ViewBag.UserSignupCounts = signupCounts;
+            // --- 4. YENİ EKLENEN: LİDERLİK TABLOSU VERİLERİ ---
+
+            // En Çok Soru Soran 5 Kişi
+            var topQuestioners = _context.Users
+                .Select(u => new { Name = u.User_name, Count = u.Questions.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(5)
+                .ToList();
+
+            // ViewBag ile View'a gönderiyoruz (Dynamic tip kullanarak)
+            ViewBag.TopQuestionersNames = topQuestioners.Select(x => x.Name).ToList();
+            ViewBag.TopQuestionersCounts = topQuestioners.Select(x => x.Count).ToList();
+
+            // En Çok Cevap Veren 5 Kişi
+            var topAnswerers = _context.Users
+                .Select(u => new { Name = u.User_name, Count = u.Answers.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(5)
+                .ToList();
+
+            ViewBag.TopAnswerersNames = topAnswerers.Select(x => x.Name).ToList();
+            ViewBag.TopAnswerersCounts = topAnswerers.Select(x => x.Count).ToList();
 
             return View();
         }

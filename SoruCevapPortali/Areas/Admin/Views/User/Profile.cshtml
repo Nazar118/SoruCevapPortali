@@ -1,0 +1,92 @@
+﻿@model SoruCevapPortali.Models.User
+
+@{
+    ViewData["Title"] = "Profilim";
+}
+
+<div class="row">
+    <div class="col-lg-6">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Profil Bilgilerim</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="Profile" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id" />
+
+                    <input type="hidden" asp-for="registration_date" />
+                    <input type="hidden" asp-for="Is_it_active" />
+
+                    <div class="text-center mb-4">
+                        <img class="img-profile rounded-circle" src="~/img/undraw_profile.svg" style="width: 100px; height: 100px;">
+                        <h5 class="mt-2 text-gray-800">@Model.User_name</h5>
+                        <p class="text-muted small">Yönetici</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="User_name" class="small mb-1">Kullanıcı Adı</label>
+                        <input asp-for="User_name" class="form-control" placeholder="Kullanıcı adınız" />
+                        <span asp-validation-for="User_name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Email" class="small mb-1">E-Posta Adresi</label>
+                        <input asp-for="Email" class="form-control" type="email" placeholder="ornek@email.com" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Password" class="small mb-1">Şifre</label>
+                        <input asp-for="Password" class="form-control" type="text" placeholder="Şifreniz" />
+                        <small class="form-text text-muted">Şifrenizi değiştirmek istemiyorsanız mevcut şifrenizi olduğu gibi bırakın.</small>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <hr>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-save fa-sm"></i> Değişiklikleri Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-info">Hesap Detayları</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Kayıt Tarihi:</strong> @Model.registration_date.ToLongDateString()</p>
+                <p>
+                    <strong>Hesap Durumu:</strong>
+                    @if (Model.Is_it_active)
+                    {
+                        <span class="badge badge-success">Aktif</span>
+                    }
+                    else
+                    {
+
+                        <span class="badge badge-danger">Pasif</span>
+                    }
+                </p>
+                <p><strong>Toplam Soru:</strong> @(Model.Questions?.Count ?? 0)</p>
+                <p><strong>Toplam Cevap:</strong> @(Model.Answers?.Count ?? 0)</p>
+            </div>
+        </div>
+    </div>
+</div>

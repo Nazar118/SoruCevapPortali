@@ -47,7 +47,7 @@ app.MapStaticAssets();
 // Admin gibi alanlara (Area) giden yolu tarif eden kural
 app.MapControllerRoute(
   name: "areas",
-  pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+  pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}"
 );
 
 app.MapControllerRoute(

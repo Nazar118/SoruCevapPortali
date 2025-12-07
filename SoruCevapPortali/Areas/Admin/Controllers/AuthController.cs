@@ -48,7 +48,7 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
                     TempData["ShowWelcomeAnimation"] = true;
 
-                    return RedirectToAction("Index", "User");
+                    return RedirectToAction("Index", "Dashboard");
                 }
                 else
                 {
