@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SoruCevapPortali.Models.Question>
+﻿@model IEnumerable<SoruCevapPortali.Models.QuestionListViewModel>
 
 @{
     ViewData["Title"] = "Ana Sayfa";
@@ -6,62 +6,85 @@
 }
 
 <div class="row mt-4">
+
     <div class="col-md-8">
-        <h3 class="mb-4 text-primary"><i class="fas fa-stream"></i> Son Sorular</h3>
+        <h3 class="mb-4 text-primary font-weight-bold"><i class="fas fa-stream"></i> Son Sorular</h3>
 
         @if (Model != null && Model.Any())
         {
-            foreach (var question in Model)
+            foreach (var item in Model)
             {
-                <div class="card mb-4 shadow-sm border-left-primary">
-                    <div class="card-body">
+                <div class="card mb-3 shadow-sm border-0 hover-effect" style="transition: transform 0.2s;">
+                    <div class="card-body p-4">
                         <div class="row">
-                            <div class="col-md-12">
-                                <h5 class="card-title">
-                                    <a asp-controller="Question" asp-action="Details" asp-route-id="@question.Id" class="text-dark font-weight-bold text-decoration-none">
-                                        @question.title
+                            <div class="col-2 text-center d-flex flex-column justify-content-center">
+                                <div class="rounded p-2 @(item.AnswerCount > 0 ? "bg-light-primary text-primary" : "bg-light text-muted")">
+                                    <h4 class="m-0 font-weight-bold">@item.AnswerCount</h4>
+                                    <small style="font-size: 0.7rem;">Cevap</small>
+                                </div>
+                            </div>
+
+                            <div class="col-10">
+                                <div class="mb-2 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge badge-light text-primary border mr-1">
+                                            @item.CategoryName
+                                        </span>
+                                        <span class="badge @item.StatusClass">
+                                            <i class="@item.StatusIcon"></i> @item.StatusText
+                                        </span>
+                                    </div>
+
+                                    @if (item.IsSolved)
+                                    {
+                                        <span class="badge badge-primary"><i class="fas fa-check-circle"></i> Çözüldü</span>
+                                    }
+                                </div>
+
+                                <h5 class="card-title mb-1">
+                                    <a asp-controller="Question" asp-action="Details" asp-route-id="@item.Id"
+                                       class="text-dark font-weight-bold text-decoration-none stretched-link"
+                                       style="font-size: 1.25rem;">
+                                        @item.Title
                                     </a>
                                 </h5>
-                                <p class="card-text text-muted">
-                                    @(question.contents != null && question.contents.Length > 120
-                                                                ? question.contents.Substring(0, 120) + "..."
-                                                                : question.contents)
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="card-footer bg-white d-flex justify-content-between align-items-center">
-                <div>
-                    <span class="badge badge-info p-2">@question.Category?.Name</span>
-                    <small class="text-muted ml-2">
-                        <i class="fas fa-user"></i> @(question.User?.User_name ?? "Anonim")
-                    </small>
-                    <small class="text-muted ml-2">
-                        <i class="far fa-clock"></i> @question.creation_date.ToShortDateString()
-                    </small>
-                </div>
-                <div>
-                    <span class="text-primary font-weight-bold">
-                        <i class="fas fa-comment-alt"></i> @(question.Answers?.Count() ?? 0) Cevap
-                    </span>
 
-                            <button class="btn btn-sm btn-outline-danger report-btn ml-2"
-                                    data-type="question"
-                                    data-id="@question.Id">
-                                <i class="fas fa-flag"></i>
-                            </button>
+                                <p class="card-text text-muted small mb-2">
+                                    @item.ContentSummary
+                                </p>
+
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user-circle text-primary"></i>
+                                        <span class="font-weight-bold text-dark">@item.UserName</span>
+                                        <span class="mx-1">•</span>
+                                        <i class="far fa-clock"></i> @item.CreatedDate.ToShortDateString()
+                                    </small>
+
+                                    <button class="btn btn-sm text-danger report-btn p-0 ml-2"
+                                            style="z-index: 2; position: relative;"
+                                            data-type="question"
+                                            data-id="@item.Id">
+                                        <i class="fas fa-flag"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                }
+            }
         }
         else
         {
-            <div class="alert alert-warning">Henüz hiç soru sorulmamış.</div>
+            <div class="alert alert-light text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <p class="lead text-muted">Henüz bu kategoride soru sorulmamış.</p>
+            </div>
         }
     </div>
 
     <div class="col-md-4">
+
         <div class="card shadow-sm mb-4">
             <div class="card-body text-center">
                 <h5 class="card-title">Bir sorunuz mu var?</h5>
@@ -87,7 +110,6 @@
                 {
                     foreach (var cat in categories)
                     {
-                        // Eğer bu kategori seçiliyse 'active' sınıfı ekle (Pembe yap)
                         var isActive = ViewBag.SelectedCategoryId == cat.Id ? "active text-white bg-primary" : "";
                         var badgeClass = ViewBag.SelectedCategoryId == cat.Id ? "badge-light text-primary" : "badge-primary";
 
@@ -105,14 +127,129 @@
             </div>
         </div>
 
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light border-bottom-0">
+                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-fire text-danger"></i> Popüler Konular</h6>
+            </div>
+            <div class="list-group list-group-flush">
+                @if (ViewBag.PopularQuestions != null)
+                {
+                    foreach (var pop in (List<SoruCevapPortali.Models.QuestionListViewModel>)ViewBag.PopularQuestions)
+                    {
+                        <a asp-controller="Question" asp-action="Details" asp-route-id="@pop.Id"
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div class="text-truncate" style="max-width: 200px;">
+                                <small class="font-weight-bold text-dark">@pop.Title</small>
+                            </div>
+                            <span class="badge badge-light text-muted border">@pop.AnswerCount Cevap</span>
+                        </a>
+                    }
+                }
+            </div>
+        </div>
+
         <div class="card shadow-sm">
-            <div class="card-header bg-light">
-                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-fire"></i> Popüler</h6>
+            <div class="card-header bg-primary text-white border-bottom-0">
+                <h6 class="m-0 font-weight-bold"><i class="fas fa-chart-pie"></i> İstatistikler</h6>
             </div>
             <div class="card-body">
-                <p class="small text-muted">Burası için HomeController'dan popüler soruları göndermemiz gerekecek.</p>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h5 class="font-weight-bold m-0 text-primary">@ViewBag.TotalUsers</h5>
+                        <small class="text-muted">Üye</small>
+                    </div>
+                    <div class="col-4 border-left border-right">
+                        <h5 class="font-weight-bold m-0 text-success">@ViewBag.TotalQuestions</h5>
+                        <small class="text-muted">Soru</small>
+                    </div>
+                    <div class="col-4">
+                        <h5 class="font-weight-bold m-0 text-info">@ViewBag.TotalAnswers</h5>
+                        <small class="text-muted">Cevap</small>
+                    </div>
+                </div>
             </div>
         </div>
 
     </div>
 </div>
+
+<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reportModalLabel">İçeriği Bildir</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reportForm">
+                    <input type="hidden" id="reportType" name="type" />
+                    <input type="hidden" id="reportId" name="id" />
+
+                    <div class="form-group">
+                        <label for="reportReason">Şikayet Nedeni:</label>
+                        <textarea class="form-control" id="reportReason" rows="3" required placeholder="Lütfen neden şikayet ettiğinizi kısaca açıklayın..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" id="submitReportBtn">Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // 1. Şikayet Butonuna Tıklanınca Modalı Aç
+            $('.report-btn').click(function () {
+                var type = $(this).data('type');
+                var id = $(this).data('id');
+
+                $('#reportType').val(type);
+                $('#reportId').val(id);
+                $('#reportReason').val('');
+
+                var myModal = new bootstrap.Modal(document.getElementById('reportModal'));
+                myModal.show();
+            });
+
+            // 2. Modaldaki "Gönder" Butonuna Tıklanınca
+            $('#submitReportBtn').click(function () {
+                var type = $('#reportType').val();
+                var id = $('#reportId').val();
+                var reason = $('#reportReason').val();
+
+                if (!reason.trim()) {
+                    alert("Lütfen bir neden yazınız.");
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Report/Create',
+                    type: 'POST',
+                    data: {
+                        questionId: type === 'question' ? id : null,
+                        answerId: type === 'answer' ? id : null,
+                        reason: reason
+                    },
+                    success: function (response) {
+                        var modalEl = document.getElementById('reportModal');
+                        var modal = bootstrap.Modal.getInstance(modalEl);
+                        modal.hide();
+
+                        if (response.success) {
+                            alert(response.message);
+                        } else {
+                            alert(response.message || "Bir hata oluştu.");
+                        }
+                    },
+                    error: function () {
+                        alert("Şikayet gönderilemedi. Lütfen giriş yaptığınızdan emin olun.");
+                    }
+                });
+            });
+        });
+    </script>
+}

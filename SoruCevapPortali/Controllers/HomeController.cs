@@ -20,31 +20,58 @@ namespace SoruCevapPortali.Controllers
         // Burasý sitenin ana sayfasý olacak (örn: https://localhost:7163/)
         public IActionResult Index(int? categoryId)
         {
-            // 1. Sorularý Hazýrlama (Sorgu Baþlangýcý)
-            var questionsQuery = _context.Questions
-                .Include(q => q.User)
-                .Include(q => q.Category)
-                .Include(q => q.Answers)
+            var query = _context.Questions
+                .Where(q => q.IsDeleted == false && q.Is_it_approved == true) // Silinmemiþ ve Onaylýlar
                 .AsQueryable();
 
-            // 2. Eðer bir kategoriye týklanmýþsa FÝLTRELE
             if (categoryId.HasValue)
             {
-                questionsQuery = questionsQuery.Where(q => q.CategoryId == categoryId);
+                query = query.Where(q => q.CategoryId == categoryId);
             }
 
-            // 3. Listeyi Çek (Tarihe göre en yeni en üstte)
-            var questions = questionsQuery
+            // ViewModel'e Çevirme Ýþlemi (Projection)
+            var viewModels = query
                 .OrderByDescending(q => q.creation_date)
+                .Select(q => new QuestionListViewModel
+                {
+                    Id = q.Id,
+                    Title = q.title,
+                    // Ýçeriðin ilk 100 karakterini al, yoksa tamamýný al
+                    ContentSummary = q.contents.Length > 100 ? q.contents.Substring(0, 100) + "..." : q.contents,
+                    CategoryName = q.Category.Name,
+                    CategoryId = q.Category.Id,
+                    UserName = q.User.User_name,
+                    AnswerCount = q.Answers.Count(), // Silinmemiþ cevaplarý saymak daha doðru olur ileride
+                    CreatedDate = q.creation_date,
+                    // Eðer cevaplardan herhangi biri "En Ýyi Cevap" ise soruyu Çözüldü say
+                    IsSolved = q.Answers.Any(a => a.IsBestAnswer)
+                })
                 .ToList();
 
-            // 4. Sidebar için kategorileri gönder
-            ViewBag.Categories = _context.Categories.Include(c => c.Questions).ToList();
+            // Sidebar kategorileri için
+            ViewBag.Categories = _context.Categories
+                .Include(c => c.Questions) 
+                .Where(c => !c.IsDeleted)
+                .ToList();
 
-            // 5. Hangi kategori seçili? (View tarafýnda boyamak için lazým)
-            ViewBag.SelectedCategoryId = categoryId;
+            // 1. Popüler Sorular (En çok cevabý olan ilk 5 soru)
+            ViewBag.PopularQuestions = _context.Questions
+                .Where(q => !q.IsDeleted && q.Is_it_approved)
+                .OrderByDescending(q => q.Answers.Count())
+                .Take(5)
+                .Select(q => new QuestionListViewModel
+                {
+                    Id = q.Id,
+                    Title = q.title,
+                    AnswerCount = q.Answers.Count()
+                })
+                .ToList();
 
-            return View(questions);
+            // 2. Site Ýstatistikleri
+            ViewBag.TotalQuestions = _context.Questions.Count(q => !q.IsDeleted && q.Is_it_approved);
+            ViewBag.TotalAnswers = _context.Answers.Count(a => !a.IsDeleted);
+            ViewBag.TotalUsers = _context.Users.Count();
+            return View(viewModels);
         }
         public IActionResult Privacy()
         {

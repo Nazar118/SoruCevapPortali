@@ -6,50 +6,59 @@
 
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Ana Sayfa</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Soru Detayı</li>
+        <ol class="breadcrumb bg-white p-0">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-muted">Ana Sayfa</a></li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">Soru Detayı</li>
         </ol>
     </nav>
 
-    <div class="card mb-4 border-left-primary shadow">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h2 class="h4 m-0 text-primary">@Model.title</h2>
-            <span class="badge badge-info">@Model.Category?.Name</span>
+    <div class="card mb-4 shadow-sm border-left-primary">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h2 class="h4 m-0 text-primary font-weight-bold">@Model.title</h2>
+            <span class="badge badge-info p-2">@Model.Category?.Name</span>
         </div>
         <div class="card-body">
-            <p class="lead" style="font-size: 1.1rem;">@Model.contents</p>
+            <p class="lead text-dark" style="font-size: 1.1rem; line-height: 1.6;">@Model.contents</p>
         </div>
-        <div class="card-footer bg-light text-muted d-flex justify-content-between">
+        <div class="card-footer bg-light text-muted d-flex justify-content-between align-items-center">
             <small>
-                <i class="fas fa-user"></i> @(Model.User?.User_name ?? "Anonim") tarafından
-                @Model.creation_date.ToShortDateString() tarihinde soruldu.
+                <i class="fas fa-user-circle"></i> @(Model.User?.User_name ?? "Anonim") &nbsp;|&nbsp;
+                <i class="far fa-clock"></i> @Model.creation_date.ToShortDateString()
             </small>
-            <button class="btn btn-sm btn-outline-danger report-btn" data-type="question" data-id="@Model.Id">
+
+            <button class="btn btn-sm btn-outline-danger report-btn"
+                    data-type="question"
+                    data-id="@Model.Id">
                 <i class="fas fa-flag"></i> Şikayet
             </button>
         </div>
     </div>
 
-    <h4 class="mb-3"><i class="fas fa-comments"></i> Cevaplar (@(Model.Answers?.Count() ?? 0))</h4>
+    <div class="d-flex align-items-center mb-3">
+        <h4 class="m-0 text-dark"><i class="fas fa-comments text-primary"></i> Cevaplar (@(Model.Answers?.Count() ?? 0))</h4>
+    </div>
 
     @if (Model.Answers != null && Model.Answers.Any())
     {
         foreach (var answer in Model.Answers)
         {
-            <div class="card mb-3 @(answer.IsBestAnswer ? "border-success" : "")">
+            <div class="card mb-3 shadow-sm border-0" style="background-color: #fff0f5;">
                 <div class="card-body">
                     @if (answer.IsBestAnswer)
                     {
                         <div class="mb-2"><span class="badge badge-success"><i class="fas fa-check"></i> En İyi Cevap</span></div>
                     }
-                    <p class="card-text">@answer.contents</p>
+                    <p class="card-text text-dark">@answer.contents</p>
                 </div>
-                <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center py-2">
                     <small class="text-muted">
                         <i class="fas fa-user"></i> @(answer.User?.User_name ?? "Anonim") - @answer.creation_date.ToShortDateString()
                     </small>
-                    <button class="btn btn-sm btn-outline-danger report-btn" data-type="answer" data-id="@answer.Id">
+
+                    <button class="btn btn-sm btn-outline-danger report-btn"
+                            data-type="answer"
+                            data-id="@answer.Id"
+                            style="border:none;">
                         <i class="fas fa-flag"></i>
                     </button>
                 </div>
@@ -58,7 +67,7 @@
     }
     else
     {
-        <div class="alert alert-light border text-center p-4">
+        <div class="alert alert-light border text-center p-4 text-muted">
             Henüz cevap verilmemiş. İlk cevabı sen yaz!
         </div>
     }
@@ -72,21 +81,103 @@
             {
                 <form asp-controller="Answer" asp-action="Create" method="post">
                     <input type="hidden" name="QuestionId" value="@Model.Id" />
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <textarea name="contents" class="form-control" rows="4" placeholder="Cevabınızı buraya yazın..." required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-success mt-3 px-4">
-                        <i class="fas fa-paper-plane"></i> Gönder
-                    </button>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-paper-plane"></i> Gönder
+                        </button>
+                    </div>
                 </form>
             }
             else
             {
-                <div class="text-center">
+                <div class="text-center py-3">
                     <p class="lead">Cevap yazmak için giriş yapmalısınız.</p>
-                    <a asp-controller="Auth" asp-action="Login" class="btn btn-primary">Giriş Yap</a>
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-primary">Giriş Yap</a>
                 </div>
             }
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reportModalLabel">İçeriği Bildir</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reportForm">
+                    <input type="hidden" id="reportType" name="type" />
+                    <input type="hidden" id="reportId" name="id" />
+                    <div class="form-group">
+                        <label for="reportReason">Şikayet Nedeni:</label>
+                        <textarea class="form-control" id="reportReason" rows="3" required placeholder="Lütfen neden şikayet ettiğinizi kısaca açıklayın..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" id="submitReportBtn">Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Butona tıklayınca Modalı Aç
+            $('.report-btn').click(function () {
+                var type = $(this).data('type');
+                var id = $(this).data('id');
+
+                $('#reportType').val(type);
+                $('#reportId').val(id);
+                $('#reportReason').val('');
+
+                var myModal = new bootstrap.Modal(document.getElementById('reportModal'));
+                myModal.show();
+            });
+
+            // Gönder butonuna tıklayınca
+            $('#submitReportBtn').click(function () {
+                var type = $('#reportType').val();
+                var id = $('#reportId').val();
+                var reason = $('#reportReason').val();
+
+                if (!reason.trim()) {
+                    alert("Lütfen bir neden yazınız.");
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Report/Create',
+                    type: 'POST',
+                    data: {
+                        questionId: type === 'question' ? id : null,
+                        answerId: type === 'answer' ? id : null,
+                        reason: reason
+                    },
+                    success: function (response) {
+                        var modalEl = document.getElementById('reportModal');
+                        var modal = bootstrap.Modal.getInstance(modalEl);
+                        modal.hide();
+
+                        if (response.success) {
+                            alert(response.message);
+                        } else {
+                            alert(response.message || "Bir hata oluştu.");
+                        }
+                    },
+                    error: function () {
+                        alert("Şikayet gönderilemedi. Lütfen giriş yaptığınızdan emin olun.");
+                    }
+                });
+            });
+        });
+    </script>
+}

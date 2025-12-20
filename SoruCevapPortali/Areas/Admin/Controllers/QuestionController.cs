@@ -9,7 +9,7 @@ using SoruCevapPortali.Models;
 namespace SoruCevapPortali.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
+    [Authorize(Roles = "Admin")] // Güvenlik: Sadece Adminler girebilsin
     public class QuestionController : Controller
     {
         private readonly IRepository<Question> _questionRepository;
@@ -25,9 +25,11 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            // DÜZELTME: SoranKullanici -> User
+            // FAZ 0 GÜNCELLEMESİ: Silinmemiş soruları getir
             var questions = _context.Questions
                                     .Include(q => q.User)
+                                    .Where(q => q.IsDeleted == false)
+                                    .OrderByDescending(q => q.creation_date)
                                     .ToList();
             return View(questions);
         }
@@ -39,7 +41,9 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
             var question = _questionRepository.GetById(id);
             if (question != null)
             {
-                _questionRepository.Delete(question);
+                // FAZ 0 GÜNCELLEMESİ: Soft Delete (Gizleme)
+                question.IsDeleted = true;
+                _questionRepository.Update(question);
             }
             return RedirectToAction(nameof(Index));
         }
@@ -50,11 +54,7 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
             var question = _questionRepository.GetById(id);
             if (question == null) return NotFound();
 
-            // DÜZELTME: KategoriId -> CategoryId (Eğer modelde değiştirdiysen)
-            // Eğer modelde hala KategoriId ise burayı KategoriId yap. 
-            // Ama biz CategoryId yapmıştık diye hatırlıyorum.
             ViewBag.Categories = new SelectList(_categoryRepository.GetAll(), "Id", "Name", question.CategoryId);
-
             return View(question);
         }
 
@@ -67,7 +67,6 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
                 _questionRepository.Update(question);
                 return RedirectToAction(nameof(Index));
             }
-            // DÜZELTME: KategoriId -> CategoryId
             ViewBag.Categories = new SelectList(_categoryRepository.GetAll(), "Id", "Name", question.CategoryId);
             return View(question);
         }

@@ -18,12 +18,20 @@ namespace SoruCevapPortali.Models
         public virtual Category? Category { get; set; }
 
         public DateTime creation_date { get; set; } // SQL: creation_date
-        public bool Is_it_approved { get; set; }    // SQL: Is_it_approved
+
+        // Mevcut onay sütunun (Adını değiştirmedik, veri kaybı olmasın)
+        public bool Is_it_approved { get; set; }
+
+        // === YENİ EKLENEN: SİLİNDİ Mİ? (Soft Delete) ===
+        public bool IsDeleted { get; set; } = false;
 
         public int UserId { get; set; }
         [ForeignKey("UserId")]
         public virtual User? User { get; set; }
 
         public virtual ICollection<Answer>? Answers { get; set; }
+
+        // === YENİ EKLENEN: BU SORUYA GELEN ŞİKAYETLER ===
+        public virtual ICollection<Report>? Reports { get; set; }
     }
 }

@@ -10,8 +10,9 @@ namespace SoruCevapPortali.Models
         [StringLength(100)]
         public string Name { get; set; }
 
-        // --- HATAYI ÇÖZEN KISIM BURASI ---
-        // Controller'da "c.Questions" diyebilmemiz için bu listenin burada olması ve adının "Questions" olması şart.
+        // === YENİ EKLENEN: SİLİNDİ Mİ? (Pasif Kategori) ===
+        public bool IsDeleted { get; set; } = false;
+
         public virtual ICollection<Question>? Questions { get; set; }
     }
 }

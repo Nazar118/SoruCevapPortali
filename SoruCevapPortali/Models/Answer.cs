@@ -11,7 +11,13 @@ namespace SoruCevapPortali.Models
         public string contents { get; set; } // SQL: contents
 
         public DateTime creation_date { get; set; } // SQL: creation_date
-        public bool IsBestAnswer { get; set; }      // SQL: IsBestAnswer (Bu doğruydu)
+        public bool IsBestAnswer { get; set; }      // SQL: IsBestAnswer
+
+
+        public bool IsApproved { get; set; } = true;
+
+        // === YENİ EKLENEN: SİLİNDİ Mİ? ===
+        public bool IsDeleted { get; set; } = false;
 
         public int UserId { get; set; }
         [ForeignKey("UserId")]
@@ -20,5 +26,8 @@ namespace SoruCevapPortali.Models
         public int QuestionId { get; set; }
         [ForeignKey("QuestionId")]
         public virtual Question? Question { get; set; }
+
+        // === YENİ EKLENEN: BU CEVABA GELEN ŞİKAYETLER ===
+        public virtual ICollection<Report>? Reports { get; set; }
     }
 }

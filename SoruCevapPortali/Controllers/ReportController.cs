@@ -1,62 +1,65 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SoruCevapPortali.Interfaces;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SoruCevapPortali.Data;
 using SoruCevapPortali.Models;
-using System.Security.Claims; // Kullanıcı ID'sini almak için
+using System.Security.Claims;
 
 namespace SoruCevapPortali.Controllers
 {
     public class ReportController : Controller
     {
-        private readonly IRepository<Report> _reportRepository;
-        private readonly IRepository<User> _userRepository;
+        private readonly ApplicationDbContext _context;
 
-        public ReportController(IRepository<Report> reportRepository, IRepository<User> userRepository)
+        public ReportController(ApplicationDbContext context)
         {
-            _reportRepository = reportRepository;
-            _userRepository = userRepository;
+            _context = context;
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken] // Güvenlik için şart
         public IActionResult Create(int? questionId, int? answerId, string reason)
         {
             // 1. GÜVENLİK KONTROLÜ: Kullanıcı giriş yapmış mı?
             if (!User.Identity.IsAuthenticated)
             {
-                // 401 (Yetkisiz) Hatası döndürür
-                return Unauthorized(new { success = false, message = "Şikayet etmek için giriş yapmalısınız." });
+                return Json(new { success = false, message = "Şikayet etmek için giriş yapmalısınız." });
             }
 
-            // 2. KULLANICI ID ALMA (Daha Güvenli Yöntem)
+            // 2. KULLANICI ID ALMA
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("UserId");
 
-            // int.Parse yerine int.TryParse kullanıyoruz ki hata olursa çökmesin
             if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int reporterId))
             {
-                return BadRequest(new { success = false, message = "Kullanıcı bilgisi alınamadı. Lütfen çıkış yapıp tekrar girin." });
+                return Json(new { success = false, message = "Kullanıcı bilgisi alınamadı. Lütfen tekrar giriş yapın." });
             }
 
-            // 3. MODEL OLUŞTURMA (Senin SQL İsimlerine Göre)
+            if (string.IsNullOrEmpty(reason))
+            {
+                return Json(new { success = false, message = "Lütfen bir şikayet sebebi belirtin." });
+            }
+
+            // 3. MODEL OLUŞTURMA
+            // NOT: Buradaki değişken isimlerinin (Reason, ReportDate vs.) Report.cs modelinle AYNI olması lazım.
+            // Eğer modelinde küçük harf kullandıysan (reason, creation_date) buraları ona göre düzeltmelisin.
             var report = new Report
             {
-                UserId = reporterId,          // SQL: UserId
-                reason = reason,              // SQL: reason
+                UserId = reporterId,
+                reason = reason,                // Modelinde 'reason' ise burayı düzelt
                 QuestionId = questionId,
                 AnswerId = answerId,
-                creation_date = DateTime.Now, // SQL: creation_date
-                is_resolved = false           // SQL: is_resolved
+                creation_date = DateTime.Now,      // Modelinde 'creation_date' ise burayı düzelt
+                is_resolved = false              // Modelinde 'is_resolved' ise burayı düzelt
             };
 
-            // 4. VERİTABANI KAYDI (Hata Yakalamalı - Try/Catch)
+            // 4. VERİTABANI KAYDI
             try
             {
-                _reportRepository.Add(report);
-                return Json(new { success = true, message = "Şikayetiniz alındı. Teşekkürler." });
+                _context.Reports.Add(report);
+                _context.SaveChanges();
+                return Json(new { success = true, message = "Şikayetiniz başarıyla alındı. Teşekkürler." });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Hata oluşursa sunucuyu çökertme, hatayı yakala ve mesaj olarak dön
-                return StatusCode(500, new { success = false, message = "Kaydedilirken bir hata oluştu." });
+                return Json(new { success = false, message = "Bir hata oluştu. Lütfen daha sonra tekrar deneyin." });
             }
         }
     }
