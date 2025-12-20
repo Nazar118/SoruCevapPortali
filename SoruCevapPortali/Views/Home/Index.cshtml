@@ -1,146 +1,118 @@
 ﻿@model IEnumerable<SoruCevapPortali.Models.Question>
 
 @{
-    ViewData["Title"] = "Ana Sayfa - Son Sorular";
+    ViewData["Title"] = "Ana Sayfa";
+    var categories = ViewBag.Categories as IEnumerable<SoruCevapPortali.Models.Category>;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Soru Cevap Portalı</h1>
-    <p>Aklınızdaki soruları sorun, bilgilerinizi paylaşın.</p>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="col-md-12">
-        <h2>Son Sorular</h2>
+<div class="row mt-4">
+    <div class="col-md-8">
+        <h3 class="mb-4 text-primary"><i class="fas fa-stream"></i> Son Sorular</h3>
 
         @if (Model != null && Model.Any())
         {
-            // DÜZELTME: Değişken adını 'question' yaptık
             foreach (var question in Model)
             {
-                <div class="card mb-3">
+                <div class="card mb-4 shadow-sm border-left-primary">
                     <div class="card-body">
-                        <h5 class="card-title">@question.title</h5>
-
-                        <p class="card-text">@question.contents</p>
-                    </div>
-                    <div class="card-footer text-muted">
-                        <span class="badge badge-info" style="font-size: 0.9rem;">@question.Category?.Name</span> ·
-
-                        <strong>@question.Answers.Count()</strong> cevap ·
-
-                        @question.User?.User_name tarafından
-
-                        @question.creation_date.ToShortDateString() tarihinde soruldu.
-                        @question.creation_date.ToShortDateString() tarihinde soruldu.
-
-                        <button class="btn btn-sm btn-outline-danger float-right report-btn"
-                                data-type="question"
-                                data-id="@question.Id">
-                            🚩 Şikayet Et
-                        </button>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="card-title">
+                                    <a asp-controller="Question" asp-action="Details" asp-route-id="@question.Id" class="text-dark font-weight-bold text-decoration-none">
+                                        @question.title
+                                    </a>
+                                </h5>
+                                <p class="card-text text-muted">
+                                    @(question.contents != null && question.contents.Length > 120
+                                                                ? question.contents.Substring(0, 120) + "..."
+                                                                : question.contents)
+                        </p>
                     </div>
                 </div>
-            }
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge badge-info p-2">@question.Category?.Name</span>
+                    <small class="text-muted ml-2">
+                        <i class="fas fa-user"></i> @(question.User?.User_name ?? "Anonim")
+                    </small>
+                    <small class="text-muted ml-2">
+                        <i class="far fa-clock"></i> @question.creation_date.ToShortDateString()
+                    </small>
+                </div>
+                <div>
+                    <span class="text-primary font-weight-bold">
+                        <i class="fas fa-comment-alt"></i> @(question.Answers?.Count() ?? 0) Cevap
+                    </span>
+
+                            <button class="btn btn-sm btn-outline-danger report-btn ml-2"
+                                    data-type="question"
+                                    data-id="@question.Id">
+                                <i class="fas fa-flag"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                }
         }
         else
         {
-            <div class="alert alert-info" role="alert">
-                Henüz gösterilecek onaylanmış bir soru bulunmamaktadır.
-            </div>
+            <div class="alert alert-warning">Henüz hiç soru sorulmamış.</div>
         }
     </div>
-</div>
 
-<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reportModalLabel">İçeriği Şikayet Et</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="reportForm">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" id="reportQuestionId" name="questionId" />
-                    <input type="hidden" id="reportAnswerId" name="answerId" />
-
-                    <div class="form-group">
-                        <label for="reportReason">Şikayet Sebebi:</label>
-                        <textarea class="form-control" id="reportReason" name="reason" rows="3" placeholder="Lütfen sebebi belirtin..." required></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                <button type="button" class="btn btn-danger" id="submitReport">Gönder</button>
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <h5 class="card-title">Bir sorunuz mu var?</h5>
+                <p class="card-text">Topluluğumuzla paylaşın ve hemen cevap alın.</p>
+                <a asp-controller="Question" asp-action="Create" class="btn btn-primary btn-block btn-lg">
+                    <i class="fas fa-plus-circle"></i> Soru Sor
+                </a>
             </div>
         </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-tags"></i> Kategoriler</h6>
+            </div>
+            <div class="list-group list-group-flush">
+                <a asp-action="Index" asp-route-categoryId=""
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(ViewBag.SelectedCategoryId == null ? "active text-white bg-primary" : "")">
+                    Tümü
+                    <span class="badge badge-light badge-pill text-dark">Hepsi</span>
+                </a>
+
+                @if (categories != null)
+                {
+                    foreach (var cat in categories)
+                    {
+                        // Eğer bu kategori seçiliyse 'active' sınıfı ekle (Pembe yap)
+                        var isActive = ViewBag.SelectedCategoryId == cat.Id ? "active text-white bg-primary" : "";
+                        var badgeClass = ViewBag.SelectedCategoryId == cat.Id ? "badge-light text-primary" : "badge-primary";
+
+                        <a asp-action="Index" asp-route-categoryId="@cat.Id"
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @isActive">
+                            @cat.Name
+                            <span class="badge @badgeClass badge-pill">@(cat.Questions?.Count() ?? 0)</span>
+                        </a>
+                    }
+                }
+                else
+                {
+                    <div class="list-group-item">Kategori bulunamadı.</div>
+                }
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-fire"></i> Popüler</h6>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted">Burası için HomeController'dan popüler soruları göndermemiz gerekecek.</p>
+            </div>
+        </div>
+
     </div>
 </div>
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            // "Şikayet Et" butonuna basılınca
-            $('.report-btn').click(function () {
-                var type = $(this).data('type'); // "question" mı "answer" mı?
-                var id = $(this).data('id');     // ID kaç?
-
-                // Önceki verileri temizle
-                $('#reportQuestionId').val('');
-                $('#reportAnswerId').val('');
-                $('#reportReason').val('');
-
-                // ID'yi doğru kutucuğa koy
-                if (type === 'question') {
-                    $('#reportQuestionId').val(id);
-                } else {
-                    $('#reportAnswerId').val(id);
-                }
-
-                // Modalı aç
-                $('#reportModal').modal('show');
-            });
-
-            // Modaldaki "Gönder" butonuna basılınca
-            $('#submitReport').click(function () {
-                var reason = $('#reportReason').val();
-                if (!reason) {
-                    alert("Lütfen bir sebep yazın.");
-                    return;
-                }
-
-                var formData = {
-                    questionId: $('#reportQuestionId').val(),
-                    answerId: $('#reportAnswerId').val(),
-                    reason: reason
-                };
-
-                $.ajax({
-                    url: '/Report/Create',
-                    type: 'POST',
-                    data: formData,
-                    headers: {
-                        // AntiForgeryToken'ı sayfanın herhangi bir yerinden bulup alıyoruz
-                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
-                    },
-                    success: function (response) {
-                        $('#reportModal').modal('hide'); // Modalı kapat
-                        if (response.success) {
-                            alert(response.message);
-                        } else {
-                            alert("Hata: " + response.message);
-                        }
-                    },
-                    error: function () {
-                        alert("Sunucuyla iletişim kurulamadı.");
-                    }
-                });
-            });
-        });
-    </script>
-}

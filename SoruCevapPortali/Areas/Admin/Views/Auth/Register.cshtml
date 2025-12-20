@@ -1,0 +1,60 @@
+﻿@model SoruCevapPortali.Models.User
+
+@{
+    ViewData["Title"] = "Kayıt Ol";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Pembe menülü ana şablonu kullan
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header bg-primary text-white text-center py-4">
+                <h3 class="font-weight-light my-1"><i class="fas fa-user-plus"></i> Aramıza Katıl</h3>
+            </div>
+
+            <div class="card-body p-5">
+                <form asp-action="Register" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="User_name" class="text-muted mb-1 font-weight-bold">Kullanıcı Adı</label>
+                        <input asp-for="User_name" class="form-control form-control-lg" placeholder="Takma adınız" required />
+                        <span asp-validation-for="User_name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Email" class="text-muted mb-1 font-weight-bold">E-Posta Adresi</label>
+                        <input asp-for="Email" class="form-control form-control-lg" type="email" placeholder="ornek@email.com" required />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label asp-for="Password" class="text-muted mb-1 font-weight-bold">Şifre</label>
+                        <input asp-for="Password" class="form-control form-control-lg" type="password" placeholder="Güçlü bir şifre belirleyin" required />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            Kayıt Ol ve Başla 🚀
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-footer text-center py-3 bg-white border-top-0">
+                <div class="small">
+                    <a asp-area="Admin" asp-controller="Auth" asp-action="Login" class="text-primary font-weight-bold">
+                        Zaten hesabın var mı? Giriş Yap
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

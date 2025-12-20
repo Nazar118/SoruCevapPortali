@@ -1,53 +1,47 @@
 ﻿@model SoruCevapPortali.Areas.Admin.ViewModels.LoginViewModel
 @{
-    Layout = null; 
     ViewData["Title"] = "Giriş Yap";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Pembe menülü ana şablonu kullan
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Admin Paneli Giriş</title>
-    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-    <link href="~/css/sb-admin-2.min.css" rel="stylesheet">
-</head>
-<body class="bg-gradient-primary">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-xl-6 col-lg-8 col-md-9">
-                <div class="card o-hidden border-0 shadow-lg my-5">
-                    <div class="card-body p-0">
-                        <div class="p-5">
-                            <div class="text-center">
-                                <h1 class="h4 text-gray-900 mb-4">Hoş Geldiniz!</h1>
-                            </div>
-                            <form class="user" asp-action="Login" method="post">
-                                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                                <div class="form-group">
-                                    <input asp-for="Email" class="form-control form-control-user" placeholder="E-posta Adresi...">
-                                    <span asp-validation-for="Email" class="text-danger"></span>
-                                </div>
-                                <div class="form-group">
-                                    <input asp-for="Sifre" class="form-control form-control-user" placeholder="Şifre">
-                                    <span asp-validation-for="Sifre" class="text-danger"></span>
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-user btn-block">
-                                    Giriş Yap
-                                </button>
-                            </form>
-                        </div>
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header bg-primary text-white text-center py-4">
+                <h3 class="font-weight-light my-1"><i class="fas fa-user-check"></i> Giriş Yap</h3>
+            </div>
+
+            <div class="card-body p-5">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <form asp-action="Login" method="post">
+                    <div class="form-group mb-3">
+                        <label asp-for="Email" class="text-muted mb-1">E-Posta Adresi</label>
+                        <input asp-for="Email" class="form-control form-control-lg" placeholder="name@example.com" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
+
+                    <div class="form-group mb-4">
+                        <label asp-for="Sifre" class="text-muted mb-1">Şifre</label>
+                        <input asp-for="Sifre" type="password" class="form-control form-control-lg" placeholder="Şifreniz" />
+                        <span asp-validation-for="Sifre" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            Giriş Yap
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-footer text-center py-3 bg-white border-top-0">
+                <div class="small">
+                    <a asp-area="Admin" asp-controller="Auth" asp-action="Register" class="text-primary font-weight-bold">
+                        Hesabın yok mu? Kayıt Ol!
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-    <script src="~/vendor/jquery/jquery.min.js"></script>
-    <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
-    <script src="~/js/sb-admin-2.min.js"></script>
-</body>
-</html>
+</div>

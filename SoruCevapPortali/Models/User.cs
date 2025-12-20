@@ -19,6 +19,8 @@ namespace SoruCevapPortali.Models
         public DateTime registration_date { get; set; } // SQL: registration_date
         public bool Is_it_active { get; set; }          // SQL: Is_it_active
 
+        public bool IsAdmin { get; set; } = false; // Varsayılan olarak herkes normal üyedir.
+
         public virtual ICollection<Question>? Questions { get; set; }
         public virtual ICollection<Answer>? Answers { get; set; }
 

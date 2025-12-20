@@ -18,20 +18,34 @@ namespace SoruCevapPortali.Controllers
         }
 
         // Burasý sitenin ana sayfasý olacak (örn: https://localhost:7163/)
-        public IActionResult Index()
+        public IActionResult Index(int? categoryId)
         {
-            var Questions
-                = _context.Questions
-                                  .Include(s => s.User)
-                                  .Include(s => s.Answers)
-                                  .Include(s => s.Category)
-                                  .Where(s => s.Is_it_approved == true) // Sadece onaylý sorular
-                                  .OrderByDescending(s => s.creation_date)
-                                  .ToList();
+            // 1. Sorularý Hazýrlama (Sorgu Baþlangýcý)
+            var questionsQuery = _context.Questions
+                .Include(q => q.User)
+                .Include(q => q.Category)
+                .Include(q => q.Answers)
+                .AsQueryable();
 
-            return View(Questions); // Modeli View'a gönder
+            // 2. Eðer bir kategoriye týklanmýþsa FÝLTRELE
+            if (categoryId.HasValue)
+            {
+                questionsQuery = questionsQuery.Where(q => q.CategoryId == categoryId);
+            }
+
+            // 3. Listeyi Çek (Tarihe göre en yeni en üstte)
+            var questions = questionsQuery
+                .OrderByDescending(q => q.creation_date)
+                .ToList();
+
+            // 4. Sidebar için kategorileri gönder
+            ViewBag.Categories = _context.Categories.Include(c => c.Questions).ToList();
+
+            // 5. Hangi kategori seçili? (View tarafýnda boyamak için lazým)
+            ViewBag.SelectedCategoryId = categoryId;
+
+            return View(questions);
         }
-
         public IActionResult Privacy()
         {
             return View();

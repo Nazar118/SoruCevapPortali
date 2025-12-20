@@ -29,9 +29,7 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
             return View(answers);
         }
 
-        // ==========================================================
-        // ===== YENİ EKLENEN EDIT (DÜZENLEME) METOTLARI =====
-        // ==========================================================
+       
 
         // 1. Düzenleme Sayfasını Aç (GET)
         [HttpGet]

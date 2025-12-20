@@ -1,31 +1,184 @@
+/* =========================================
+   1. MEVCUT AYARLAR (KORUNDU & GÜNCELLENDÝ)
+   ========================================= */
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-color: #fdfbfb; /* Hafif kýrýk beyaz zemin */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Focus (Odaklanma) Rengi: Maviden Pembeye Çevrildi */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    border-color: #e6a4b4;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #d63384; /* Pembe Gölge */
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+    color: var(--bs-secondary-color);
+    text-align: end;
 }
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+    text-align: start;
+}
+
+
+
+:root {
+    --main-pink: #d63384; /* Ana Pembe */
+    --dark-pink: #a61e61; /* Koyu Pembe (Hover için) */
+    --light-pink: #fff0f5; /* Çok Açýk Pembe (Arkaplanlar için) */
+    --soft-rose: #e6a4b4; /* Yumuþak Gül Rengi */
+}
+
+a {
+    color: var(--main-pink);
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+    a:hover {
+        color: var(--dark-pink);
+    }
+
+/* NAVBAR (Üst Menü) */
+.navbar {
+    background-color: #ffffff !important;
+    border-bottom: 3px solid var(--soft-rose) !important;
+}
+
+.navbar-brand i {
+    color: var(--main-pink) !important;
+}
+
+.nav-link {
+    color: #555 !important;
+    font-weight: 500;
+}
+
+    .nav-link:hover {
+        color: var(--main-pink) !important;
+    }
+
+/* BUTONLAR */
+/* Ana Buton (Soru Sor, Giriþ vb.) */
+.btn-primary {
+    background-color: var(--main-pink);
+    border-color: var(--main-pink);
+    color: white;
+}
+
+    .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+        background-color: var(--dark-pink) !important;
+        border-color: var(--dark-pink) !important;
+    }
+
+/* Outline Butonlar */
+.btn-outline-primary {
+    color: var(--main-pink);
+    border-color: var(--main-pink);
+}
+
+    .btn-outline-primary:hover {
+        background-color: var(--main-pink);
+        border-color: var(--main-pink);
+        color: white;
+    }
+
+/* KART TASARIMLARI */
+.card {
+    border: none;
+    border-radius: 12px; /* Köþeleri biraz daha yumuþattýk */
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: #fff;
+}
+
+    /* Hover olunca kart hafifçe kalksýn */
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.1);
+    }
+
+/* Sol tarafý çizgili kartlar için (Mavi yerine Pembe) */
+.border-left-primary {
+    border-left: 0.25rem solid var(--main-pink) !important;
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* ROZETLER (Badges - Kategori Ýsimleri vb.) */
+.badge-primary {
+    background-color: var(--main-pink);
+}
+
+.badge-info {
+    background-color: var(--soft-rose);
+    color: white;
+}
+
+/* METÝN RENKLERÝ */
+.text-primary {
+    color: var(--main-pink) !important;
+}
+
+/* ÞÝKAYET BUTONU (Yumuþatýlmýþ Kýrmýzý/Gül Tonu) */
+.btn-outline-danger {
+    color: #d63384; /* Kýrmýzý yerine koyu pembe */
+    border-color: #e6a4b4;
+}
+
+    .btn-outline-danger:hover {
+        background-color: var(--main-pink);
+        border-color: var(--main-pink);
+        color: white;
+    }
+
+/* SÝDEBAR LÝSTESÝ */
+.list-group-item {
+    border: none;
+    border-bottom: 1px solid #f8f9fa;
+    color: #555;
+}
+
+    .list-group-item:hover {
+        background-color: var(--light-pink);
+        color: var(--main-pink);
+        padding-left: 1.5rem; /* Hover olunca hafif saða kaysýn */
+        transition: all 0.2s;
+    }
+
+.badge-pill {
+    background-color: var(--soft-rose);
+}
+
+.bg-primary {
+    background-color: var(--main-pink) !important;
+}
+
+/* Sidebar'da seçili olan (Active) kategoriyi pembe yap */
+.list-group-item.active {
+    background-color: var(--main-pink) !important;
+    border-color: var(--main-pink) !important;
+    color: white !important;
+}
+
+/* Seçili olmayanlarýn üzerine gelince açýk pembe olsun */
+.list-group-item-action:hover {
+    background-color: var(--light-pink);
+    color: var(--dark-pink);
 }
