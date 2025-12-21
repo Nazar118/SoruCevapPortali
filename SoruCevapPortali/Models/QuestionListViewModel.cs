@@ -1,4 +1,6 @@
-﻿namespace SoruCevapPortali.Models
+﻿using System;
+
+namespace SoruCevapPortali.Models
 {
     public class QuestionListViewModel
     {
@@ -14,37 +16,59 @@
         public bool IsSolved { get; set; }
 
 
-        // Rozetin üzerinde ne yazacak?
+        // 1. StatusText için özel alan (Backing Field)
+        private string _statusText;
         public string StatusText
         {
             get
             {
+                // Eğer dışarıdan (Controller'dan) özel bir yazı atandıysa onu göster
+                if (!string.IsNullOrEmpty(_statusText))
+                    return _statusText;
+
+                // Atanmadıysa standart mantığı çalıştır
                 if (AnswerCount == 0) return "Cevap Bekliyor";
                 if (AnswerCount > 5) return "Popüler";
                 return "Cevaplandı";
             }
+            set
+            {
+                // Dışarıdan değer atanabilmesi için set bloğu eklendi
+                _statusText = value;
+            }
         }
 
-        // Rozetin rengi ne olacak? (Bootstrap sınıfları)
+        // 2. StatusClass için özel alan
+        private string _statusClass;
         public string StatusClass
         {
             get
             {
-                if (AnswerCount == 0) return "badge-warning text-dark"; // Sarı
-                if (AnswerCount > 5) return "badge-danger";             // Kırmızı
-                return "badge-success";                                 // Yeşil
+                if (!string.IsNullOrEmpty(_statusClass))
+                    return _statusClass;
+
+                if (AnswerCount == 0) return "badge-warning text-dark";
+                if (AnswerCount > 5) return "badge-danger";
+                return "badge-success";
             }
+            set { _statusClass = value; }
         }
 
-        // İkon ne olacak?
+        // 3. StatusIcon için özel alan
+        private string _statusIcon;
         public string StatusIcon
         {
             get
             {
+                if (!string.IsNullOrEmpty(_statusIcon))
+                    return _statusIcon;
+
                 if (AnswerCount == 0) return "fas fa-hourglass-half";
                 if (AnswerCount > 5) return "fas fa-fire";
                 return "fas fa-check";
             }
+            set { _statusIcon = value; }
         }
+        // --- DÜZELTİLEN KISIM BİTİŞİ ---
     }
 }

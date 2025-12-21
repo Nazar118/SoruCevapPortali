@@ -29,9 +29,11 @@ html {
 }
 
 body {
-    margin-bottom: 60px;
-    background-color: var(--bg-body); /* ARTIK KOYU */
-    color: var(--text-main); /* ARTIK AÇIK RENK YAZI */
+    padding-top: 80px; /* Navbar sabitlenince içerik altýnda kalmasýn diye üstten itiyoruz */
+    padding-bottom: 60px;
+
+    background-color: var(--bg-body);
+    color: var(--text-main);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -45,9 +47,7 @@ a {
         color: #ff85c1; /* Koyu temada hover olunca daha parlak olsun */
     }
 
-/* ========================================= */
 /* 3. NAVBAR (ÜST MENÜ)                      */
-/* ========================================= */
 .navbar {
     background-color: var(--bg-card) !important; /* KOYU */
     border-bottom: 2px solid var(--border-color) !important;
@@ -264,3 +264,28 @@ a {
     color: #fff !important;
     border: 1px solid #444;
 }
+/* Sabit kalacak paneller için sýnýf */
+.sabit-panel {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 90px; /* Navbar (80px) + 10px boþluk = 90px aþaðýda dursun */
+
+    z-index: 90; /* Navbar'ýn (z-index:1030) altýnda kalsýn diye düþürdük */
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    padding-right: 5px; /* Scroll çubuðu içeriðe yapýþmasýn */
+}
+
+    /* Scroll çubuðu kodlarýn (webkit) aynen kalabilir, onlarda sorun yok */
+    .sabit-panel::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .sabit-panel::-webkit-scrollbar-track {
+        background: #1e1e1e;
+    }
+
+    .sabit-panel::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 5px;
+    }

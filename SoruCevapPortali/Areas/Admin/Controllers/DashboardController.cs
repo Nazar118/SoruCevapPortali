@@ -7,7 +7,7 @@ using System.Linq;
 namespace SoruCevapPortali.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class DashboardController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -50,22 +50,31 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
             ViewBag.UserDates = last7Days.Select(d => d.ToString("dd MMM")).ToArray();
             ViewBag.UserCounts = userCounts;
 
-            // --- 4. YENİ EKLENEN: LİDERLİK TABLOSU VERİLERİ ---
+            // --- 4. LİDERLİK TABLOSU VERİLERİ (GÜNCELLENDİ) ---
 
-            // En Çok Soru Soran 5 Kişi
+            // En Çok Soru Soran 5 Kişi (Sadece Silinmemiş ve Onaylanmışlar)
             var topQuestioners = _context.Users
-                .Select(u => new { Name = u.User_name, Count = u.Questions.Count() })
+                .Select(u => new {
+                    Name = u.User_name,
+                    Count = u.Questions.Count(q => !q.IsDeleted && q.Is_it_approved)
+                })
+                .Where(x => x.Count > 0) // Hiç sorusu olmayanları listeye alma
                 .OrderByDescending(x => x.Count)
                 .Take(5)
                 .ToList();
 
-            // ViewBag ile View'a gönderiyoruz (Dynamic tip kullanarak)
             ViewBag.TopQuestionersNames = topQuestioners.Select(x => x.Name).ToList();
             ViewBag.TopQuestionersCounts = topQuestioners.Select(x => x.Count).ToList();
 
-            // En Çok Cevap Veren 5 Kişi
+
+            // En Çok Cevap Veren 5 Kişi (Sadece Silinmemişler)
             var topAnswerers = _context.Users
-                .Select(u => new { Name = u.User_name, Count = u.Answers.Count() })
+                .Select(u => new {
+                    Name = u.User_name,
+                    // DÜZELTME: Sadece silinmemiş cevapları say
+                    Count = u.Answers.Count(a => !a.IsDeleted)
+                })
+                .Where(x => x.Count > 0) // Hiç cevabı olmayanları listeye alma
                 .OrderByDescending(x => x.Count)
                 .Take(5)
                 .ToList();

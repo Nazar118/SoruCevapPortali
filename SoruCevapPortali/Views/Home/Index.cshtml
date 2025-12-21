@@ -7,18 +7,49 @@
 
 <div class="row mt-4">
 
-    <div class="col-md-8">
+    <div class="col-lg-2 d-none d-lg-block">
+        <div class="sabit-panel">
+            <partial name="~/Views/Shared/_LeftMenuPartial.cshtml" />
+        </div>
+    </div>
+
+    <div class="col-lg-7 col-md-12">
+
         <h3 class="mb-4 text-primary font-weight-bold"><i class="fas fa-stream"></i> Son Sorular</h3>
+
+        <div class="filter-bar d-flex flex-wrap align-items-center justify-content-between mb-4 p-2 rounded" style="background-color: var(--bg-card); border: 1px solid var(--border-color);">
+
+            <div class="btn-group" role="group">
+                <a asp-action="Index"
+                   asp-route-sortOrder=""
+                   asp-route-categoryId="@ViewBag.SelectedCategoryId"
+                   class="btn btn-sm @(string.IsNullOrEmpty(ViewBag.CurrentSort) ? "btn-primary" : "btn-outline-secondary text-light")">
+                    En Yeniler
+                </a>
+
+                <a asp-action="Index"
+                   asp-route-sortOrder="popular"
+                   asp-route-categoryId="@ViewBag.SelectedCategoryId"
+                   class="btn btn-sm @(ViewBag.CurrentSort == "popular" ? "btn-primary" : "btn-outline-secondary text-light")">
+                    <i class="fas fa-fire"></i> Popüler
+                </a>
+
+                <a asp-action="Index"
+                   asp-route-status="unanswered"
+                   asp-route-categoryId="@ViewBag.SelectedCategoryId"
+                   class="btn btn-sm @(ViewBag.CurrentStatus == "unanswered" ? "btn-primary" : "btn-outline-secondary text-light")">
+                    <i class="fas fa-hourglass-half"></i> Cevapsız
+                </a>
+            </div>
+
+            <div>
+                <a asp-action="RandomQuestion" class="btn btn-sm btn-outline-info" style="border-color: var(--main-pink); color: var(--main-pink);">
+                    <i class="fas fa-dice"></i> Rastgele Soru
+                </a>
+            </div>
+        </div>
         @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch as string))
         {
-            <div class="alert alert-info d-flex justify-content-between align-items-center mb-4"
-                 style="background-color: rgba(232, 62, 140, 0.2); border-color: var(--main-pink); color: #fff;">
-                <span>
-                    <i class="fas fa-search"></i>
-                    <strong>"@ViewBag.CurrentSearch"</strong> için sonuçlar gösteriliyor.
-                </span>
-                <a asp-action="Index" class="btn btn-sm btn-outline-light">Filtreyi Temizle</a>
-            </div>
         }
 
         @if (Model != null && Model.Any())
@@ -94,117 +125,95 @@
         }
     </div>
 
-    <div class="col-md-4">
+    <div class="col-lg-3">
+        <div class="sabit-panel">
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <form asp-action="Index" method="get">
-                    @if (ViewBag.SelectedCategoryId != null)
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form asp-action="Index" method="get">
+                        @if (ViewBag.SelectedCategoryId != null)
+                        {
+                            <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategoryId" />
+                        }
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control" placeholder="Soru veya içerik ara..." value="@ViewBag.CurrentSearch" style="background-color: var(--bg-input); color: white; border-color: #444;">
+                            <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Bir sorunuz mu var?</h5>
+                    <p class="card-text">Topluluğumuzla paylaşın ve hemen cevap alın.</p>
+                    <a asp-controller="Question" asp-action="Create" class="btn btn-primary btn-block btn-lg">
+                        <i class="fas fa-plus-circle"></i> Soru Sor
+                    </a>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light"><h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-tags"></i> Kategoriler</h6></div>
+                <div class="list-group list-group-flush">
+                    <a asp-action="Index" asp-route-categoryId="" class="list-group-item @(ViewBag.SelectedCategoryId == null ? "active text-white bg-primary" : "")">
+                        Tümü...
+                    </a>
+                    @if (categories != null)
                     {
-                        <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategoryId" />
+                        foreach (var cat in categories)
+                        {
+                            var isActive = ViewBag.SelectedCategoryId == cat.Id ? "active text-white bg-primary" : "";
+                            <a asp-action="Index" asp-route-categoryId="@cat.Id" class="list-group-item @isActive">
+                                @cat.Name
+                            </a>
+                        }
                     }
-
-                    <div class="input-group">
-                        <input type="text" name="search" class="form-control"
-                               placeholder="Soru veya içerik ara..."
-                               value="@ViewBag.CurrentSearch"
-                               style="background-color: var(--bg-input); color: white; border-color: #444;">
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
-        </div>
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-body text-center">
-                <h5 class="card-title">Bir sorunuz mu var?</h5>
-                <p class="card-text">Topluluğumuzla paylaşın ve hemen cevap alın.</p>
-                <a asp-controller="Question" asp-action="Create" class="btn btn-primary btn-block btn-lg">
-                    <i class="fas fa-plus-circle"></i> Soru Sor
-                </a>
-            </div>
-        </div>
-
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-light">
-                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-tags"></i> Kategoriler</h6>
-            </div>
-            <div class="list-group list-group-flush">
-                <a asp-action="Index" asp-route-categoryId=""
-                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(ViewBag.SelectedCategoryId == null ? "active text-white bg-primary" : "")">
-                    Tümü
-                    <span class="badge badge-light badge-pill text-dark">Hepsi</span>
-                </a>
-
-                @if (categories != null)
-                {
-                    foreach (var cat in categories)
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light border-bottom-0"><h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-fire text-danger"></i> Popüler Konular</h6></div>
+                <div class="list-group list-group-flush">
+                    @if (ViewBag.PopularQuestions != null)
                     {
-                        var isActive = ViewBag.SelectedCategoryId == cat.Id ? "active text-white bg-primary" : "";
-                        var badgeClass = ViewBag.SelectedCategoryId == cat.Id ? "badge-light text-primary" : "badge-primary";
-
-                        <a asp-action="Index" asp-route-categoryId="@cat.Id"
-                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @isActive">
-                            @cat.Name
-                            <span class="badge @badgeClass badge-pill">@(cat.Questions?.Count() ?? 0)</span>
-                        </a>
+                        foreach (var pop in (List<SoruCevapPortali.Models.QuestionListViewModel>)ViewBag.PopularQuestions)
+                        {
+                            <a asp-controller="Question" asp-action="Details" asp-route-id="@pop.Id"
+                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div class="text-truncate" style="max-width: 200px;">
+                                    <small class="font-weight-bold text-dark">@pop.Title</small>
+                                </div>
+                                <span class="badge badge-light text-muted border">@pop.AnswerCount Cevap</span>
+                            </a>
+                        }
                     }
-                }
-                else
-                {
-                    <div class="list-group-item">Kategori bulunamadı.</div>
-                }
+                </div>
             </div>
-        </div>
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-light border-bottom-0">
-                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-fire text-danger"></i> Popüler Konular</h6>
-            </div>
-            <div class="list-group list-group-flush">
-                @if (ViewBag.PopularQuestions != null)
-                {
-                    foreach (var pop in (List<SoruCevapPortali.Models.QuestionListViewModel>)ViewBag.PopularQuestions)
-                    {
-                        <a asp-controller="Question" asp-action="Details" asp-route-id="@pop.Id"
-                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <div class="text-truncate" style="max-width: 200px;">
-                                <small class="font-weight-bold text-dark">@pop.Title</small>
-                            </div>
-                            <span class="badge badge-light text-muted border">@pop.AnswerCount Cevap</span>
-                        </a>
-                    }
-                }
-            </div>
-        </div>
-
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white border-bottom-0">
-                <h6 class="m-0 font-weight-bold"><i class="fas fa-chart-pie"></i> İstatistikler</h6>
-            </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-4">
-                        <h5 class="font-weight-bold m-0 text-primary">@ViewBag.TotalUsers</h5>
-                        <small class="text-muted">Üye</small>
-                    </div>
-                    <div class="col-4 border-left border-right">
-                        <h5 class="font-weight-bold m-0 text-success">@ViewBag.TotalQuestions</h5>
-                        <small class="text-muted">Soru</small>
-                    </div>
-                    <div class="col-4">
-                        <h5 class="font-weight-bold m-0 text-info">@ViewBag.TotalAnswers</h5>
-                        <small class="text-muted">Cevap</small>
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white border-bottom-0"><h6 class="m-0 font-weight-bold"><i class="fas fa-chart-pie"></i> İstatistikler</h6></div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h5 class="font-weight-bold m-0 text-primary">@ViewBag.TotalUsers</h5>
+                            <small class="text-muted">Üye</small>
+                        </div>
+                        <div class="col-4 border-left border-right">
+                            <h5 class="font-weight-bold m-0 text-success">@ViewBag.TotalQuestions</h5>
+                            <small class="text-muted">Soru</small>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="font-weight-bold m-0 text-info">@ViewBag.TotalAnswers</h5>
+                            <small class="text-muted">Cevap</small>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
+        </div>
     </div>
 </div>
-
 <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -234,20 +243,16 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // 1. Şikayet Butonuna Tıklanınca Modalı Aç
             $('.report-btn').click(function () {
                 var type = $(this).data('type');
                 var id = $(this).data('id');
-
                 $('#reportType').val(type);
                 $('#reportId').val(id);
                 $('#reportReason').val('');
-
                 var myModal = new bootstrap.Modal(document.getElementById('reportModal'));
                 myModal.show();
             });
 
-            // 2. Modaldaki "Gönder" Butonuna Tıklanınca
             $('#submitReportBtn').click(function () {
                 var type = $('#reportType').val();
                 var id = $('#reportId').val();
@@ -270,7 +275,6 @@
                         var modalEl = document.getElementById('reportModal');
                         var modal = bootstrap.Modal.getInstance(modalEl);
                         modal.hide();
-
                         if (response.success) {
                             alert(response.message);
                         } else {

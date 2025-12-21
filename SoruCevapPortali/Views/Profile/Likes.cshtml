@@ -1,0 +1,67 @@
+﻿@model IEnumerable<SoruCevapPortali.Models.Answer>
+
+@{
+    ViewData["Title"] = "Beğendiklerim";
+}
+
+<div class="row mt-4">
+    <div class="col-lg-2 d-none d-lg-block">
+        <partial name="~/Views/Shared/_LeftMenuPartial.cshtml" />
+    </div>
+
+    <div class="col-lg-7 col-md-12">
+        <h3 class="mb-4 text-danger font-weight-bold">
+            <i class="fas fa-heart"></i> Beğendiğim Cevaplar
+        </h3>
+
+        @if (Model != null && Model.Any())
+        {
+            foreach (var answer in Model)
+            {
+                <div class="card mb-3 shadow-sm border-0 hover-effect" style="transition: transform 0.2s;">
+                    <div class="card-header bg-transparent border-bottom-0 pt-3 pb-0">
+                        <small class="text-muted">Şu soruya verilen cevap:</small>
+                        <h5 class="mt-1">
+                            <a asp-controller="Question" asp-action="Details" asp-route-id="@answer.QuestionId"
+                               class="text-primary font-weight-bold text-decoration-none">
+                                @answer.Question?.title
+                            </a>
+                        </h5>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="p-3 rounded" style="background-color: rgba(255, 255, 255, 0.05); border-left: 3px solid #dc3545;">
+                            <p class="card-text mb-0 font-italic">
+                                <i class="fas fa-quote-left text-muted mr-2"></i>
+                                @answer.contents
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-user-edit"></i> Yazan: <strong>@answer.User?.User_name</strong>
+                            <span class="mx-1">•</span>
+                            @answer.creation_date.ToShortDateString()
+                        </small>
+
+                        <a asp-controller="Question" asp-action="Details" asp-route-id="@answer.QuestionId" class="btn btn-sm btn-outline-light">
+                            Git <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-light text-center py-5">
+                <i class="far fa-heart fa-3x text-muted mb-3"></i>
+                <p class="lead text-muted">Henüz hiçbir cevabı beğenmediniz.</p>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">Keşfetmeye Başla</a>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-3 d-none d-lg-block">
+    </div>
+</div>

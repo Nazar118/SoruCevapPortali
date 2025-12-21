@@ -1,0 +1,68 @@
+﻿@model IEnumerable<SoruCevapPortali.Models.QuestionListViewModel>
+
+@{
+    ViewData["Title"] = "Favorilerim";
+}
+
+<div class="row mt-4">
+    <div class="col-lg-2 d-none d-lg-block">
+        <partial name="~/Views/Shared/_LeftMenuPartial.cshtml" />
+    </div>
+
+    <div class="col-lg-7 col-md-12">
+        <h3 class="mb-4 text-warning font-weight-bold">
+            <i class="fas fa-star"></i> Favorilerim
+        </h3>
+
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <div class="card mb-3 shadow-sm border-0 hover-effect" style="transition: transform 0.2s;">
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-2 text-center d-flex flex-column justify-content-center">
+                                <div class="rounded p-2 @(item.AnswerCount > 0 ? "bg-light-primary text-primary" : "bg-light text-muted")">
+                                    <h4 class="m-0 font-weight-bold">@item.AnswerCount</h4>
+                                    <small style="font-size: 0.7rem;">Cevap</small>
+                                </div>
+                            </div>
+                            <div class="col-10">
+                                <div class="mb-2 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge badge-light text-primary border mr-1">@item.CategoryName</span>
+                                    </div>
+                                    @if (item.IsSolved)
+                                    {
+                                        <span class="badge badge-primary"><i class="fas fa-check-circle"></i> Çözüldü</span>
+                                    }
+                                </div>
+                                <h5 class="card-title mb-1">
+                                    <a asp-controller="Question" asp-action="Details" asp-route-id="@item.Id"
+                                       class="text-dark font-weight-bold text-decoration-none stretched-link">
+                                        @item.Title
+                                    </a>
+                                </h5>
+                                <p class="card-text text-muted small mb-2">@item.ContentSummary</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-user-circle"></i> @item.UserName • @item.CreatedDate.ToShortDateString()
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-light text-center py-5">
+                <i class="far fa-star fa-3x text-muted mb-3"></i>
+                <p class="lead text-muted">Henüz hiç favori sorunuz yok.</p>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">Keşfetmeye Başla</a>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-3 d-none d-lg-block">
+    </div>
+</div>

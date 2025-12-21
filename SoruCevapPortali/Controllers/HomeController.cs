@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // Include için eklendi
-using SoruCevapPortali.Data; // DbContext için eklendi
+using Microsoft.EntityFrameworkCore;
+using SoruCevapPortali.Data;
 using SoruCevapPortali.Models;
 using System.Diagnostics;
 
@@ -8,43 +8,72 @@ namespace SoruCevapPortali.Controllers
 {
     public class HomeController : Controller
     {
-        // _logger yerine _context'i kullanýyoruz
         private readonly ApplicationDbContext _context;
 
-        // Constructor'ý da _context'i alacak þekilde deðiþtiriyoruz
         public HomeController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // Burasý sitenin ana sayfasý olacak (örn: https://localhost:7163/)
-        // Index Artýk hem kategori hem de arama kelimesi alýyor
-        public IActionResult Index(string search, int? categoryId)
+        // GÜNCELLENDÝ: Artýk sýralama (sortOrder) ve durum (status) parametreleri de alýyor
+        public IActionResult Index(string search, int? categoryId, string sortOrder, string status)
         {
+            // Filtre seçimlerini View'da hatýrlamak için ViewBag'e atýyoruz
+            ViewBag.CurrentSearch = search;
+            ViewBag.SelectedCategoryId = categoryId;
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.CurrentStatus = status;
+
             // 1. Temel Sorgu: Silinmemiþ ve Onaylanmýþ sorular
             var query = _context.Questions
                 .Include(q => q.Category)
                 .Include(q => q.User)
-                .Include(q => q.Answers) // Cevap sayýlarý için lazým
+                .Include(q => q.Answers)
                 .Where(q => !q.IsDeleted && q.Is_it_approved)
                 .AsQueryable();
 
-            // 2. Kategori Seçilmiþse Filtrele
+            // 2. Kategori Filtresi
             if (categoryId.HasValue)
             {
                 query = query.Where(q => q.CategoryId == categoryId);
             }
 
-            // 3. ARAMA YAPILMIÞSA FÝLTRELE (YENÝ KISIM) ??
+            // 3. Arama Filtresi
             if (!string.IsNullOrEmpty(search))
             {
-                // Baþlýkta VEYA Ýçerikte aranan kelime geçiyor mu?
                 query = query.Where(q => q.title.Contains(search) || q.contents.Contains(search));
+            }
+
+            // --- YENÝ EKLENEN KISIM: DURUM FÝLTRESÝ (Cevapsýz / Çözüldü) ---
+            if (!string.IsNullOrEmpty(status))
+            {
+                switch (status)
+                {
+                    case "unanswered": // Hiç cevabý olmayanlar
+                        query = query.Where(q => q.Answers.Count == 0);
+                        break;
+                    case "solved": // En az bir tane "En Ýyi Cevap" seçilmiþ olanlar
+                        query = query.Where(q => q.Answers.Any(a => a.IsBestAnswer));
+                        break;
+                }
+            }
+
+            // --- YENÝ EKLENEN KISIM: SIRALAMA (Popüler / En Yeni) ---
+            switch (sortOrder)
+            {
+                case "popular": // En çok cevaplananlar en üstte
+                    query = query.OrderByDescending(q => q.Answers.Count).ThenByDescending(q => q.creation_date);
+                    break;
+                case "oldest": // En eskiler
+                    query = query.OrderBy(q => q.creation_date);
+                    break;
+                default: // Varsayýlan: En Yeni (Newest)
+                    query = query.OrderByDescending(q => q.creation_date);
+                    break;
             }
 
             // 4. ViewModel'e Çevir
             var viewModels = query
-                .OrderByDescending(q => q.creation_date)
                 .Select(q => new QuestionListViewModel
                 {
                     Id = q.Id,
@@ -59,13 +88,15 @@ namespace SoruCevapPortali.Controllers
                 })
                 .ToList();
 
-            // 5. Sidebar Verileri
+            // --- SIDEBAR VERÝLERÝ (Aynen Korundu) ---
+
+            // Kategoriler
             ViewBag.Categories = _context.Categories
                 .Include(c => c.Questions)
                 .Where(c => !c.IsDeleted)
                 .ToList();
 
-            // Popüler Sorular (Sidebar)
+            // Popüler Sorular (Sidebar için)
             ViewBag.PopularQuestions = _context.Questions
                 .Where(q => !q.IsDeleted && q.Is_it_approved)
                 .OrderByDescending(q => q.Answers.Count())
@@ -73,17 +104,34 @@ namespace SoruCevapPortali.Controllers
                 .Select(q => new QuestionListViewModel { Id = q.Id, Title = q.title, AnswerCount = q.Answers.Count() })
                 .ToList();
 
-            // Ýstatistikler (Sidebar)
+            // Ýstatistikler
             ViewBag.TotalQuestions = _context.Questions.Count(q => !q.IsDeleted && q.Is_it_approved);
             ViewBag.TotalAnswers = _context.Answers.Count(a => !a.IsDeleted);
             ViewBag.TotalUsers = _context.Users.Count();
 
-            // View'a Bilgi Gönder (Arama kutusunda aranan kelime dursun diye)
-            ViewBag.CurrentSearch = search;
-            ViewBag.SelectedCategoryId = categoryId;
-
             return View(viewModels);
         }
+
+        // --- YENÝ EKLENEN METOT: RASTGELE SORU ---
+        public IActionResult RandomQuestion()
+        {
+            // Veritabanýndan rastgele bir soru seç
+            var randomQuestion = _context.Questions
+                .Where(q => !q.IsDeleted && q.Is_it_approved)
+                // SQL Server'da Guid.NewGuid() verileri rastgele sýralar
+                .OrderBy(r => Guid.NewGuid())
+                .FirstOrDefault();
+
+            if (randomQuestion != null)
+            {
+                // Soru varsa detay sayfasýna yönlendir
+                return RedirectToAction("Details", "Question", new { id = randomQuestion.Id });
+            }
+
+            // Soru yoksa ana sayfaya dön
+            return RedirectToAction("Index");
+        }
+
         public IActionResult Privacy()
         {
             return View();

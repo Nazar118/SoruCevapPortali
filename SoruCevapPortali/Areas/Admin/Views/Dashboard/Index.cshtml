@@ -1,207 +1,287 @@
 ﻿@{
     ViewData["Title"] = "Yönetim Paneli";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
+<div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4 container-fluid">
     <h1 class="h3 mb-0 text-gray-800">📊 Genel Bakış</h1>
+    <span id="connectionStatus" class="badge bg-secondary text-white p-2 shadow-sm">
+        <i class="fas fa-satellite-dish"></i> Bağlantı Bekleniyor...
+    </span>
 </div>
 
-<div class="row">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Toplam Soru</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewData["TotalQuestions"]</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2" style="border-left: 5px solid #4e73df;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Toplam Soru</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewData["TotalQuestions"]</div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-question fa-2x text-gray-300"></i></div>
                     </div>
-                    <div class="col-auto"><i class="fas fa-question fa-2x text-gray-300"></i></div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-success shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Toplam Cevap</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewData["TotalAnswers"]</div>
-                    </div>
-                    <div class="col-auto"><i class="fas fa-comments fa-2x text-gray-300"></i></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-warning shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Onay Bekleyen</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewData["PendingQuestionsCount"]</div>
-                    </div>
-                    <div class="col-auto"><i class="fas fa-clock fa-2x text-gray-300"></i></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-info shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Kullanıcılar</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewData["TotalUsers"]</div>
-                    </div>
-                    <div class="col-auto"><i class="fas fa-users fa-2x text-gray-300"></i></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row">
-    <div class="col-xl-4 col-lg-5">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Soru Dağılımı</h6>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2" style="border-left: 5px solid #1cc88a;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Toplam Cevap</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewData["TotalAnswers"]</div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-comments fa-2x text-gray-300"></i></div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="chart-pie pt-4 pb-2">
-                    <canvas id="myPieChart"></canvas>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2" style="border-left: 5px solid #f6c23e;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Onay Bekleyen</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewData["PendingQuestionsCount"]</div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-clock fa-2x text-gray-300"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2" style="border-left: 5px solid #36b9cc;">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Kullanıcılar</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewData["TotalUsers"]</div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-users fa-2x text-gray-300"></i></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-xl-8 col-lg-7">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Haftalık Yeni Üyeler</h6>
+    <div class="row">
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Soru Dağılımı (Kategori)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="myPieChart" style="height: 250px;"></canvas>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="chart-area">
-                    <canvas id="myAreaChart"></canvas>
+        </div>
+
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Haftalık Yeni Üyeler</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="myAreaChart" style="height: 320px; width: 100%;"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 bg-primary text-white">
-                <h6 class="m-0 font-weight-bold text-white">🏆 En Çok Soru Soranlar</h6>
-            </div>
-            <div class="card-body">
-                <ul class="list-group">
-                    @{
-                        var qNames = ViewBag.TopQuestionersNames as List<string>;
-                        var qCounts = ViewBag.TopQuestionersCounts as List<int>;
-                        if (qNames != null && qNames.Count > 0)
-                        {
-                            for (int i = 0; i < qNames.Count; i++)
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold text-white">🏆 En Çok Soru Soranlar</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        @{
+                            var qNames = ViewBag.TopQuestionersNames as List<string>;
+                            var qCounts = ViewBag.TopQuestionersCounts as List<int>;
+                            if (qNames != null && qNames.Count > 0)
                             {
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>@(i + 1). @qNames[i]</span>
-                                    <span class="badge badge-primary badge-pill">@qCounts[i] Soru</span>
-                                </li>
+                                for (int i = 0; i < qNames.Count; i++)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>@(i + 1). <strong>@qNames[i]</strong></span>
+                                        <span class="badge bg-primary rounded-pill">@qCounts[i] Soru</span>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li class="list-group-item">Henüz veri yok.</li>
                             }
                         }
-                        else
-                        {
-                            <li class="list-group-item">Henüz veri yok.</li>
-                        }
-                    }
-                </ul>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 bg-success text-white">
-                <h6 class="m-0 font-weight-bold text-white">💬 En Çok Cevap Verenler</h6>
-            </div>
-            <div class="card-body">
-                <ul class="list-group">
-                    @{
-                        var aNames = ViewBag.TopAnswerersNames as List<string>;
-                        var aCounts = ViewBag.TopAnswerersCounts as List<int>;
-                        if (aNames != null && aNames.Count > 0)
-                        {
-                            for (int i = 0; i < aNames.Count; i++)
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-success text-white">
+                    <h6 class="m-0 font-weight-bold text-white">💬 En Çok Cevap Verenler</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        @{
+                            var aNames = ViewBag.TopAnswerersNames as List<string>;
+                            var aCounts = ViewBag.TopAnswerersCounts as List<int>;
+                            if (aNames != null && aNames.Count > 0)
                             {
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>@(i + 1). @aNames[i]</span>
-                                    <span class="badge badge-success badge-pill">@aCounts[i] Cevap</span>
-                                </li>
+                                for (int i = 0; i < aNames.Count; i++)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>@(i + 1). <strong>@aNames[i]</strong></span>
+                                        <span class="badge bg-success rounded-pill">@aCounts[i] Cevap</span>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li class="list-group-item">Henüz veri yok.</li>
                             }
                         }
-                        else
-                        {
-                            <li class="list-group-item">Henüz veri yok.</li>
-                        }
-                    }
-                </ul>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
 
 @section Scripts {
     <script>
-        // PASTA GRAFİK (Tam Yuvarlak)
-        var ctxPie = document.getElementById("myPieChart");
-        var myPieChart = new Chart(ctxPie, {
-            type: 'pie',
-            data: {
-                labels: @Html.Raw(Json.Serialize(ViewBag.CatLabels)),
-                datasets: [{
-                    data: @Html.Raw(Json.Serialize(ViewBag.CatCounts)),
-                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],
-                    hoverBorderColor: "rgba(234, 236, 244, 1)",
-                }],
-            },
-            options: {
-                maintainAspectRatio: false,
-                legend: { display: true, position: 'right' }, // Yazılar sağda
-                cutoutPercentage: 0,
-            },
+        // --- 1. SIGNALR BAĞLANTISI (CANLI VERİ) ---
+        var connection = new signalR.HubConnectionBuilder().withUrl("/general-hub").build();
+
+        connection.start().then(function () {
+            var statusBadge = document.getElementById("connectionStatus");
+            statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> Canlı Veri Aktif';
+            statusBadge.className = "badge bg-success text-white p-2 shadow-sm";
+        }).catch(function (err) {
+            console.error(err.toString());
+            var statusBadge = document.getElementById("connectionStatus");
+            statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> Bağlantı Hatası';
+            statusBadge.className = "badge bg-danger text-white p-2 shadow-sm";
         });
 
-        // ÇİZGİ GRAFİK
-        var ctxArea = document.getElementById("myAreaChart");
+        // Yeni veri geldiğinde (Notification) sayfayı yenile
+        connection.on("ReceiveQuestionNotification", function () {
+            location.reload(); 
+        });
+
+
+        // --- 2. PASTA GRAFİK (Tam Daire + Dönme Animasyonu) ---
+         var ctxPie = document.getElementById("myPieChart").getContext('2d');
+         var myPieChart = new Chart(ctxPie, {
+             type: 'pie', // TİP: Pasta (Dolu)
+             data: {
+                 labels: @Html.Raw(Json.Serialize(ViewBag.CatLabels)),
+                 datasets: [{
+                     data: @Html.Raw(Json.Serialize(ViewBag.CatCounts)),
+                     backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],
+                     hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#dda20a', '#be2617'],
+                     hoverBorderColor: "rgba(234, 236, 244, 1)",
+                     borderWidth: 1 // Dilimler arası ince çizgi
+                 }],
+             },
+             options: {
+                 maintainAspectRatio: false,
+                 cutout: 0, // ÖNEMLİ: Ortadaki boşluğu tamamen kapatır (0)
+                 animation: {
+                     animateScale: true,  // Merkezden dışa doğru büyüyerek gelir
+                     animateRotate: true, // Saat yönünde dönerek oluşur
+                     duration: 2000,      // Animasyon 2 saniye sürsün (Daha yavaş ve belirgin)
+                     easing: 'easeOutCirc' // Yumuşak bir bitiş efekti
+                 },
+                 plugins: {
+                     legend: {
+                         display: true,
+                         position: 'bottom',
+                         labels: {
+                             color: '#d1d3e2', // Yazı rengini temana uygun hale getirdim
+                             padding: 20
+                         }
+                     },
+                     tooltip: {
+                         backgroundColor: "rgb(255,255,255)",
+                         bodyColor: "#858796",
+                         borderColor: '#dddfeb',
+                         borderWidth: 1,
+                         xPadding: 15,
+                         yPadding: 15,
+                         displayColors: false,
+                         caretPadding: 10,
+                     },
+                 }
+             },
+         });
+
+
+        // --- 3. ÇİZGİ GRAFİK (Chart.js v3+ Uyumlu) ---
+        var ctxArea = document.getElementById("myAreaChart").getContext('2d');
         var myAreaChart = new Chart(ctxArea, {
             type: 'line',
             data: {
                 labels: @Html.Raw(Json.Serialize(ViewBag.UserDates)),
                 datasets: [{
-                    label: "Kayıtlar",
+                    label: "Yeni Üyeler",
                     lineTension: 0.3,
                     backgroundColor: "rgba(78, 115, 223, 0.05)",
                     borderColor: "rgba(78, 115, 223, 1)",
                     pointRadius: 3,
                     pointBackgroundColor: "rgba(78, 115, 223, 1)",
                     pointBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHoverRadius: 3,
+                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHitRadius: 10,
+                    pointBorderWidth: 2,
                     data: @Html.Raw(Json.Serialize(ViewBag.UserCounts)),
                 }],
             },
             options: {
                 maintainAspectRatio: false,
-                layout: { padding: { left: 10, right: 25, top: 25, bottom: 0 } },
-                scales: {
-                    xAxes: [{ gridLines: { display: false, drawBorder: false } }],
-                    yAxes: [{
-                        ticks: { maxTicksLimit: 5, padding: 10, beginAtZero: true, callback: function(value) { if (Math.floor(value) === value) return value; } },
-                        gridLines: { color: "rgb(234, 236, 244)", zeroLineColor: "rgb(234, 236, 244)", drawBorder: false, borderDash: [2], zeroLineBorderDash: [2] }
-                    }],
+                layout: {
+                    padding: { left: 10, right: 25, top: 25, bottom: 0 }
                 },
-                legend: { display: false }
+                scales: {
+                    x: {
+                        grid: { display: false, drawBorder: false },
+                        ticks: { maxTicksLimit: 7 }
+                    },
+                    y: {
+                        ticks: {
+                            maxTicksLimit: 5,
+                            padding: 10,
+                            callback: function(value) { if (Math.floor(value) === value) return value; } // Ondalıklı sayı gösterme
+                        },
+                        grid: {
+                            color: "rgb(234, 236, 244)",
+                            zeroLineColor: "rgb(234, 236, 244)",
+                            drawBorder: false,
+                            borderDash: [2],
+                            zeroLineBorderDash: [2]
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
             }
         });
     </script>

@@ -1,0 +1,43 @@
+﻿<div class="sticky-top" style="top: 90px; z-index: 1;">
+
+    <div class="list-group mb-4">
+
+        <a asp-controller="Home" asp-action="Index" class="list-group-item list-group-item-action bg-transparent border-0 px-2 py-3">
+            <h5 class="mb-0"><i class="fas fa-home mr-3 text-primary" style="width:25px;"></i> Ana Sayfa</h5>
+        </a>
+
+        <a asp-controller="Home" asp-action="Index" class="list-group-item list-group-item-action bg-transparent border-0 px-2 py-3 font-weight-bold text-white">
+            <h5 class="mb-0"><i class="fas fa-stream mr-3 text-primary" style="width:25px;"></i> Akış</h5>
+        </a>
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <a asp-controller="Profile" asp-action="MyQuestions" class="list-group-item list-group-item-action bg-transparent border-0 px-2 py-3 text-muted">
+                <h5 class="mb-0"><i class="fas fa-question-circle mr-3 text-info" style="width:25px;"></i> Sorularım</h5>
+            </a>
+            <a asp-controller="Profile" asp-action="Favorites" class="list-group-item list-group-item-action bg-transparent border-0 px-2 py-3 text-muted">
+                <h5 class="mb-0"><i class="fas fa-star mr-3 text-warning" style="width:25px;"></i> Favorilerim</h5>
+            </a>
+
+            <a asp-controller="Profile" asp-action="Likes" class="list-group-item list-group-item-action bg-transparent border-0 px-2 py-3 text-muted">
+                <h5 class="mb-0"><i class="fas fa-heart mr-3 text-danger" style="width:25px;"></i> Beğendiklerim</h5>
+            </a>
+        }
+        else
+        {
+            <div class="p-3 mt-2 rounded border border-secondary text-center">
+                <small class="text-muted d-block mb-2">Özellikleri kullanmak için</small>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-sm btn-outline-primary w-100">Giriş Yap</a>
+            </div>
+        }
+    </div>
+
+    <div class="px-2">
+        <hr class="border-secondary">
+        <small class="text-muted">
+            &copy; 2025 SoruCevap<br>
+            <a href="#" class="text-muted mr-2">Hakkımızda</a>
+            <a href="#" class="text-muted">İletişim</a>
+        </small>
+    </div>
+</div>
