@@ -1,3 +1,21 @@
+
+:root {
+    /* --- SENÝN PEMBE TONLARIN --- */
+    --main-pink: #e83e8c; /* Biraz daha neonumsu bir pembe (Koyu zeminde parlasýn diye) */
+    --dark-pink: #d63384; /* Hover rengi */
+    --soft-rose: #e6a4b4; /* Yumuþak detaylar */
+    /* Eski 'light-pink' beyazdý, þimdi koyu zeminde sýrýtmasýn diye koyu-þeffaf pembe yapýyoruz */
+    --light-pink: rgba(232, 62, 140, 0.15);
+    --bg-body: #121212; /* Sayfa Arka Planý (Simsiyah deðil) */
+    --bg-card: #1e1e1e; /* Kart Arka Planý (Bir týk açýk) */
+    --bg-input: #2a2a2a; /* Input Kutularý */
+    --border-color: #333333; /* Çerçeveler */
+    /* --- YAZI RENKLERÝ --- */
+    --text-main: #e4e6eb; /* Ana Metin (Beyazýmsý) */
+    --text-muted: #b0b3b8; /* Silik Metin (Gri) */
+}
+
+
 html {
     font-size: 14px;
     position: relative;
@@ -12,32 +30,9 @@ html {
 
 body {
     margin-bottom: 60px;
-    background-color: #fdfbfb; /* Hafif kýrýk beyaz zemin */
+    background-color: var(--bg-body); /* ARTIK KOYU */
+    color: var(--text-main); /* ARTIK AÇIK RENK YAZI */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Focus (Odaklanma) Rengi: Maviden Pembeye Çevrildi */
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    border-color: #e6a4b4;
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #d63384; /* Pembe Gölge */
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-    color: var(--bs-secondary-color);
-    text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-    text-align: start;
-}
-
-
-
-:root {
-    --main-pink: #d63384; /* Ana Pembe */
-    --dark-pink: #a61e61; /* Koyu Pembe (Hover için) */
-    --light-pink: #fff0f5; /* Çok Açýk Pembe (Arkaplanlar için) */
-    --soft-rose: #e6a4b4; /* Yumuþak Gül Rengi */
 }
 
 a {
@@ -47,13 +42,16 @@ a {
 }
 
     a:hover {
-        color: var(--dark-pink);
+        color: #ff85c1; /* Koyu temada hover olunca daha parlak olsun */
     }
 
-/* NAVBAR (Üst Menü) */
+/* ========================================= */
+/* 3. NAVBAR (ÜST MENÜ)                      */
+/* ========================================= */
 .navbar {
-    background-color: #ffffff !important;
-    border-bottom: 3px solid var(--soft-rose) !important;
+    background-color: var(--bg-card) !important; /* KOYU */
+    border-bottom: 2px solid var(--border-color) !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 .navbar-brand i {
@@ -61,7 +59,7 @@ a {
 }
 
 .nav-link {
-    color: #555 !important;
+    color: var(--text-muted) !important; /* Gri yazý */
     font-weight: 500;
 }
 
@@ -69,20 +67,74 @@ a {
         color: var(--main-pink) !important;
     }
 
-/* BUTONLAR */
-/* Ana Buton (Soru Sor, Giriþ vb.) */
+/* Kullanýcý "Merhaba, X" kýsmý */
+.navbar-text {
+    color: var(--text-main) !important;
+}
+
+/* 4. KART TASARIMLARI (Senin Ayarlarýn)     */
+.card {
+    border: 1px solid var(--border-color); /* Hafif gri çizgi */
+    border-radius: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: var(--bg-card); /* KOYU KART */
+    color: var(--text-main);
+    position: relative; /* Z-index için gerekli */
+}
+
+    /* Hover Efekti (Senin kodun korundu) */
+    .card:hover, .hover-effect:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,0.5) !important; /* Gölgeyi koyulaþtýrdýk */
+        border-color: var(--border-color);
+    }
+
+.card-header {
+    background-color: var(--bg-card); /* Baþlýk da koyu */
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+/* Sol çizgili kart (Örn: Soru listesi) */
+.border-left-primary {
+    border-left: 0.25rem solid var(--main-pink) !important;
+}
+
+/* 5. INPUT VE FORMLAR (Karanlýk Mod)        */
+.form-control {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+    /* Inputa týklayýnca (Focus) */
+    .form-control:focus {
+        background-color: var(--bg-input);
+        color: #fff;
+        border-color: var(--main-pink);
+        box-shadow: 0 0 0 0.25rem rgba(232, 62, 140, 0.25);
+    }
+
+    /* Placeholder (Silik yazý) rengi */
+    .form-control::placeholder {
+        color: #6c757d;
+    }
+
+/* 6. BUTONLAR VE ROZETLER                   */
+
+/* Ana Buton */
 .btn-primary {
     background-color: var(--main-pink);
     border-color: var(--main-pink);
     color: white;
 }
 
-    .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
-        background-color: var(--dark-pink) !important;
-        border-color: var(--dark-pink) !important;
+    .btn-primary:hover {
+        background-color: var(--dark-pink);
+        border-color: var(--dark-pink);
     }
 
-/* Outline Butonlar */
+/* Outline Buton */
 .btn-outline-primary {
     color: var(--main-pink);
     border-color: var(--main-pink);
@@ -90,110 +142,125 @@ a {
 
     .btn-outline-primary:hover {
         background-color: var(--main-pink);
-        border-color: var(--main-pink);
         color: white;
     }
 
-/* KART TASARIMLARI */
-.card {
-    border: none;
-    border-radius: 12px; /* Köþeleri biraz daha yumuþattýk */
-    transition: transform 0.2s, box-shadow 0.2s;
-    background-color: #fff;
+/* Þikayet Butonu */
+.btn-outline-danger {
+    color: #ff6b6b;
+    border-color: #ff6b6b;
 }
 
-    /* Hover olunca kart hafifçe kalksýn */
-    .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.1);
+    .btn-outline-danger:hover {
+        background-color: #ff6b6b;
+        color: white;
     }
 
-/* Sol tarafý çizgili kartlar için (Mavi yerine Pembe) */
-.border-left-primary {
-    border-left: 0.25rem solid var(--main-pink) !important;
-}
-
-.card-header {
-    background-color: white;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-/* ROZETLER (Badges - Kategori Ýsimleri vb.) */
+/* Rozetler (Badge) */
 .badge-primary {
     background-color: var(--main-pink);
+    color: white;
+}
+
+.badge-light {
+    background-color: #333; /* Açýk rozetleri koyu gri yaptýk */
+    color: var(--text-main);
 }
 
 .badge-info {
     background-color: var(--soft-rose);
-    color: white;
+    color: #333; /* Okunabilirlik için siyah yazý */
 }
 
-/* METÝN RENKLERÝ */
+/* Cevap Sayýsý Kutusu (Senin bg-light-primary) */
+.bg-light-primary {
+    background-color: rgba(232, 62, 140, 0.1) !important; /* Þeffaf pembe */
+    color: var(--main-pink) !important;
+}
+
+/* 7. SIDEBAR VE LISTELER                    */
+.list-group-item {
+    background-color: var(--bg-card);
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-muted);
+}
+
+    .list-group-item:hover {
+        background-color: #252525; /* Hover olunca hafif aç */
+        color: var(--main-pink);
+        padding-left: 1.5rem; /* Senin kayma efektin korundu */
+    }
+
+    /* Aktif Kategori */
+    .list-group-item.active {
+        background-color: var(--main-pink) !important;
+        border-color: var(--main-pink) !important;
+        color: white !important;
+    }
+
+/* Dark temada "text-dark" yazýlarý görünmez olur (siyah on siyah), 
+   onlarý zorla beyaza çeviriyoruz */
+.text-dark {
+    color: var(--text-main) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* Kart içindeki linklerin z-index ayarý (Senin kodun) */
+.card .btn, .card .badge {
+    position: relative;
+    z-index: 2;
+}
+
+/* Modal Kutusu */
+.modal-content {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+.modal-header, .modal-footer {
+    border-color: var(--border-color);
+}
+
+.btn-close {
+    filter: invert(1); /* Çarpý iþaretini beyaz yap */
+}
+
+
+
+/* Sidebar'daki ve Kartlardaki inatçý beyaz arka planlarý temizle */
+.bg-light, .bg-white {
+    background-color: var(--bg-card) !important; /* Koyu Gri Yap */
+    color: var(--text-main) !important; /* Yazýyý Beyaz Yap */
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Sidebar'daki "Ýstatistikler" baþlýðýnýn mavisini pembe yap */
+.bg-primary {
+    background-color: var(--main-pink) !important;
+    color: white !important;
+}
+
+/* Mavi olan baþlýklarý ve ikonlarý pembe yap */
 .text-primary {
     color: var(--main-pink) !important;
 }
 
-/* ÞÝKAYET BUTONU (Yumuþatýlmýþ Kýrmýzý/Gül Tonu) */
-.btn-outline-danger {
-    color: #d63384; /* Kýrmýzý yerine koyu pembe */
-    border-color: #e6a4b4;
+/* Soru Detay Sayfasýndaki Cevap Kartlarýnýn Kenarlýðý */
+/* (Inline style kaldýrýlýnca devreye girecek) */
+.answer-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--main-pink); /* Solu pembe çizgili olsun */
 }
 
-    .btn-outline-danger:hover {
-        background-color: var(--main-pink);
-        border-color: var(--main-pink);
-        color: white;
-    }
-
-/* SÝDEBAR LÝSTESÝ */
-.list-group-item {
-    border: none;
-    border-bottom: 1px solid #f8f9fa;
-    color: #555;
+/* Sidebar Rozetleri (Badges) */
+.badge-light {
+    background-color: #333 !important;
+    color: #fff !important;
+    border: 1px solid #444;
 }
-
-    .list-group-item:hover {
-        background-color: var(--light-pink);
-        color: var(--main-pink);
-        padding-left: 1.5rem; /* Hover olunca hafif saða kaysýn */
-        transition: all 0.2s;
-    }
-
-.badge-pill {
-    background-color: var(--soft-rose);
-}
-
-.bg-primary {
-    background-color: var(--main-pink) !important;
-}
-
-/* Sidebar'da seçili olan (Active) kategoriyi pembe yap */
-.list-group-item.active {
-    background-color: var(--main-pink) !important;
-    border-color: var(--main-pink) !important;
-    color: white !important;
-}
-
-/* Seçili olmayanlarýn üzerine gelince açýk pembe olsun */
-.list-group-item-action:hover {
-    background-color: var(--light-pink);
-    color: var(--dark-pink);
-}
-
-.bg-light-primary {
-    background-color: #fff0f5 !important; /* Pembe zemin */
-}
-
-.hover-effect:hover {
-    transform: translateY(-3px); /* Hafif yukarý kalkma */
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
-}
-
-.card {
-    position: relative;
-}
-
-    .card .btn, .card .badge {
-        position: relative;
-        z-index: 2; /* Linklerin üstünde kalsýn */
-    }

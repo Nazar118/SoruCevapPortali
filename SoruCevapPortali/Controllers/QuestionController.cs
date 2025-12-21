@@ -17,18 +17,50 @@ namespace SoruCevapPortali.Controllers
         }
 
         // 1. SORU DETAY SAYFASI
-        public IActionResult Details(int? id)
+        public IActionResult Details(int id)
         {
-            if (id == null) return NotFound();
-
+            // 1. Soruyu ve cevapları getir
             var question = _context.Questions
-                .Include(q => q.User)      // Soruyu soran kullanıcı
-                .Include(q => q.Category)  // Kategorisi
-                .Include(q => q.Answers)   // Cevaplar
-                    .ThenInclude(a => a.User) // Cevabı yazan kullanıcılar
-                .FirstOrDefault(m => m.Id == id);
+                .Include(q => q.Category)
+                .Include(q => q.User)
+                .Include(q => q.Answers)
+                    .ThenInclude(a => a.User)
+                .FirstOrDefault(q => q.Id == id);
 
             if (question == null) return NotFound();
+
+            // 2. Şu anki kullanıcının ID'sini bul
+            int currentUserId = 0;
+            if (User.Identity.IsAuthenticated)
+            {
+                var userName = User.Identity.Name;
+                var user = _context.Users.FirstOrDefault(u => u.User_name == userName || u.Email == userName);
+                if (user != null) currentUserId = user.Id;
+            }
+
+            // 3. Soru Favoride mi kontrol et
+            if (currentUserId > 0)
+            {
+                question.IsFavoritedByCurrentUser = _context.Favorites
+                    .Any(f => f.QuestionId == id && f.UserId == currentUserId);
+            }
+
+            // 4. Cevapların Beğenilerini kontrol et
+            if (question.Answers != null)
+            {
+                foreach (var answer in question.Answers)
+                {
+                    // Bu cevap kaç kere beğenilmiş?
+                    answer.LikeCount = _context.AnswerLikes.Count(l => l.AnswerId == answer.Id);
+
+                    // Ben bu cevabı beğenmiş miyim?
+                    if (currentUserId > 0)
+                    {
+                        answer.IsLikedByCurrentUser = _context.AnswerLikes
+                            .Any(l => l.AnswerId == answer.Id && l.UserId == currentUserId);
+                    }
+                }
+            }
 
             return View(question);
         }

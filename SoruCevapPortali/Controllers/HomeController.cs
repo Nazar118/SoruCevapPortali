@@ -18,59 +18,70 @@ namespace SoruCevapPortali.Controllers
         }
 
         // Burasý sitenin ana sayfasý olacak (örn: https://localhost:7163/)
-        public IActionResult Index(int? categoryId)
+        // Index Artýk hem kategori hem de arama kelimesi alýyor
+        public IActionResult Index(string search, int? categoryId)
         {
+            // 1. Temel Sorgu: Silinmemiþ ve Onaylanmýþ sorular
             var query = _context.Questions
-                .Where(q => q.IsDeleted == false && q.Is_it_approved == true) // Silinmemiþ ve Onaylýlar
+                .Include(q => q.Category)
+                .Include(q => q.User)
+                .Include(q => q.Answers) // Cevap sayýlarý için lazým
+                .Where(q => !q.IsDeleted && q.Is_it_approved)
                 .AsQueryable();
 
+            // 2. Kategori Seçilmiþse Filtrele
             if (categoryId.HasValue)
             {
                 query = query.Where(q => q.CategoryId == categoryId);
             }
 
-            // ViewModel'e Çevirme Ýþlemi (Projection)
+            // 3. ARAMA YAPILMIÞSA FÝLTRELE (YENÝ KISIM) ??
+            if (!string.IsNullOrEmpty(search))
+            {
+                // Baþlýkta VEYA Ýçerikte aranan kelime geçiyor mu?
+                query = query.Where(q => q.title.Contains(search) || q.contents.Contains(search));
+            }
+
+            // 4. ViewModel'e Çevir
             var viewModels = query
                 .OrderByDescending(q => q.creation_date)
                 .Select(q => new QuestionListViewModel
                 {
                     Id = q.Id,
                     Title = q.title,
-                    // Ýçeriðin ilk 100 karakterini al, yoksa tamamýný al
                     ContentSummary = q.contents.Length > 100 ? q.contents.Substring(0, 100) + "..." : q.contents,
                     CategoryName = q.Category.Name,
                     CategoryId = q.Category.Id,
                     UserName = q.User.User_name,
-                    AnswerCount = q.Answers.Count(), // Silinmemiþ cevaplarý saymak daha doðru olur ileride
+                    AnswerCount = q.Answers.Count(a => !a.IsDeleted),
                     CreatedDate = q.creation_date,
-                    // Eðer cevaplardan herhangi biri "En Ýyi Cevap" ise soruyu Çözüldü say
                     IsSolved = q.Answers.Any(a => a.IsBestAnswer)
                 })
                 .ToList();
 
-            // Sidebar kategorileri için
+            // 5. Sidebar Verileri
             ViewBag.Categories = _context.Categories
-                .Include(c => c.Questions) 
+                .Include(c => c.Questions)
                 .Where(c => !c.IsDeleted)
                 .ToList();
 
-            // 1. Popüler Sorular (En çok cevabý olan ilk 5 soru)
+            // Popüler Sorular (Sidebar)
             ViewBag.PopularQuestions = _context.Questions
                 .Where(q => !q.IsDeleted && q.Is_it_approved)
                 .OrderByDescending(q => q.Answers.Count())
                 .Take(5)
-                .Select(q => new QuestionListViewModel
-                {
-                    Id = q.Id,
-                    Title = q.title,
-                    AnswerCount = q.Answers.Count()
-                })
+                .Select(q => new QuestionListViewModel { Id = q.Id, Title = q.title, AnswerCount = q.Answers.Count() })
                 .ToList();
 
-            // 2. Site Ýstatistikleri
+            // Ýstatistikler (Sidebar)
             ViewBag.TotalQuestions = _context.Questions.Count(q => !q.IsDeleted && q.Is_it_approved);
             ViewBag.TotalAnswers = _context.Answers.Count(a => !a.IsDeleted);
             ViewBag.TotalUsers = _context.Users.Count();
+
+            // View'a Bilgi Gönder (Arama kutusunda aranan kelime dursun diye)
+            ViewBag.CurrentSearch = search;
+            ViewBag.SelectedCategoryId = categoryId;
+
             return View(viewModels);
         }
         public IActionResult Privacy()

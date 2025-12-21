@@ -33,5 +33,9 @@ namespace SoruCevapPortali.Models
 
         // === YENİ EKLENEN: BU SORUYA GELEN ŞİKAYETLER ===
         public virtual ICollection<Report>? Reports { get; set; }
+        // Question class'ının süslü parantezleri bitmeden hemen önceye:
+
+        [NotMapped] 
+        public bool IsFavoritedByCurrentUser { get; set; }
     }
 }

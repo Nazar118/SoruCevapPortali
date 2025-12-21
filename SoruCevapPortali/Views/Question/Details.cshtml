@@ -6,7 +6,7 @@
 
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-white p-0">
+        <ol class="breadcrumb bg-white p-0" style="background-color: transparent !important;">
             <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-muted">Ana Sayfa</a></li>
             <li class="breadcrumb-item active text-primary" aria-current="page">Soru Detayı</li>
         </ol>
@@ -14,7 +14,19 @@
 
     <div class="card mb-4 shadow-sm border-left-primary">
         <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-            <h2 class="h4 m-0 text-primary font-weight-bold">@Model.title</h2>
+            <div class="d-flex align-items-center">
+                <h2 class="h4 m-0 text-primary font-weight-bold mr-2">@Model.title</h2>
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    var favClass = Model.IsFavoritedByCurrentUser ? "btn-warning text-white" : "btn-outline-warning";
+                    var iconClass = Model.IsFavoritedByCurrentUser ? "fas" : "far";
+
+                    <button class="btn @favClass btn-sm ml-2" id="btnFavorite" data-id="@Model.Id" title="Favorilere Ekle" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                        <i class="@iconClass fa-star"></i>
+                    </button>
+                }
+            </div>
             <span class="badge badge-info p-2">@Model.Category?.Name</span>
         </div>
         <div class="card-body">
@@ -42,7 +54,7 @@
     {
         foreach (var answer in Model.Answers)
         {
-            <div class="card mb-3 shadow-sm border-0" style="background-color: #fff0f5;">
+            <div class="card mb-3 shadow-sm border-0 answer-card">
                 <div class="card-body">
                     @if (answer.IsBestAnswer)
                     {
@@ -50,17 +62,32 @@
                     }
                     <p class="card-text text-dark">@answer.contents</p>
                 </div>
+
                 <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center py-2">
                     <small class="text-muted">
                         <i class="fas fa-user"></i> @(answer.User?.User_name ?? "Anonim") - @answer.creation_date.ToShortDateString()
                     </small>
 
-                    <button class="btn btn-sm btn-outline-danger report-btn"
-                            data-type="answer"
-                            data-id="@answer.Id"
-                            style="border:none;">
-                        <i class="fas fa-flag"></i>
-                    </button>
+                    <div class="d-flex align-items-center">
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            var likeClass = answer.IsLikedByCurrentUser ? "btn-danger text-white" : "btn-outline-danger";
+                            var heartIcon = answer.IsLikedByCurrentUser ? "fas" : "far";
+
+                            <button class="btn btn-sm @likeClass btn-like mr-2" data-id="@answer.Id" title="Beğen">
+                                <i class="@heartIcon fa-heart"></i>
+                                <span class="like-count ml-1 font-weight-bold">@answer.LikeCount</span>
+                            </button>
+                        }
+
+                        <button class="btn btn-sm btn-outline-secondary report-btn"
+                                data-type="answer"
+                                data-id="@answer.Id"
+                                style="border:none;">
+                            <i class="fas fa-flag"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         }
@@ -130,20 +157,18 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Butona tıklayınca Modalı Aç
+
+            // --- 1. ŞİKAYET MODAL KODLARI (ESKİ) ---
             $('.report-btn').click(function () {
                 var type = $(this).data('type');
                 var id = $(this).data('id');
-
                 $('#reportType').val(type);
                 $('#reportId').val(id);
                 $('#reportReason').val('');
-
                 var myModal = new bootstrap.Modal(document.getElementById('reportModal'));
                 myModal.show();
             });
 
-            // Gönder butonuna tıklayınca
             $('#submitReportBtn').click(function () {
                 var type = $('#reportType').val();
                 var id = $('#reportId').val();
@@ -166,7 +191,6 @@
                         var modalEl = document.getElementById('reportModal');
                         var modal = bootstrap.Modal.getInstance(modalEl);
                         modal.hide();
-
                         if (response.success) {
                             alert(response.message);
                         } else {
@@ -178,6 +202,51 @@
                     }
                 });
             });
+
+            // --- 2. YENİ EKLENEN: FAVORİ İŞLEMİ ---
+            $('#btnFavorite').click(function () {
+                var btn = $(this);
+                var id = btn.data('id');
+                var icon = btn.find('i');
+
+                $.post('/Interaction/ToggleFavorite', { questionId: id }, function (res) {
+                    if (res.success) {
+                        if (res.isFavorited) {
+                            icon.removeClass('far').addClass('fas'); // İçi dolu yıldız
+                            btn.addClass('btn-warning text-white').removeClass('btn-outline-warning');
+                        } else {
+                            icon.removeClass('fas').addClass('far'); // İçi boş yıldız
+                            btn.removeClass('btn-warning text-white').addClass('btn-outline-warning');
+                        }
+                    } else {
+                        alert("İşlem başarısız: " + (res.message || "Giriş yapmalısınız."));
+                    }
+                });
+            });
+
+            // --- 3. YENİ EKLENEN: BEĞENİ İŞLEMİ ---
+            $('.btn-like').click(function () {
+                var btn = $(this);
+                var id = btn.data('id');
+                var icon = btn.find('i');
+                var countSpan = btn.find('.like-count');
+
+                $.post('/Interaction/ToggleAnswerLike', { answerId: id }, function (res) {
+                    if (res.success) {
+                        countSpan.text(res.newCount); // Sayıyı güncelle
+                        if (res.isLiked) {
+                            icon.removeClass('far').addClass('fas'); // Dolu kalp
+                            btn.addClass('btn-danger text-white').removeClass('btn-outline-danger');
+                        } else {
+                            icon.removeClass('fas').addClass('far'); // Boş kalp
+                            btn.removeClass('btn-danger text-white').addClass('btn-outline-danger');
+                        }
+                    } else {
+                        alert("İşlem başarısız: " + (res.message || "Giriş yapmalısınız."));
+                    }
+                });
+            });
+
         });
     </script>
 }

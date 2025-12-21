@@ -14,6 +14,8 @@ namespace SoruCevapPortali.Data
         public DbSet<Answer> Answers { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Report> Reports { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
+        public DbSet<AnswerLike> AnswerLikes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

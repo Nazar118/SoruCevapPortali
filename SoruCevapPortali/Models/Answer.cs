@@ -27,7 +27,11 @@ namespace SoruCevapPortali.Models
         [ForeignKey("QuestionId")]
         public virtual Question? Question { get; set; }
 
-        // === YENİ EKLENEN: BU CEVABA GELEN ŞİKAYETLER ===
         public virtual ICollection<Report>? Reports { get; set; }
+        [NotMapped]
+        public bool IsLikedByCurrentUser { get; set; }
+
+        [NotMapped]
+        public int LikeCount { get; set; }
     }
 }
