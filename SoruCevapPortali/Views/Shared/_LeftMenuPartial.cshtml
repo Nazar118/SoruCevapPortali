@@ -6,8 +6,9 @@
             <h5 class="mb-0"><i class="fas fa-home mr-3 text-primary" style="width:25px;"></i> Ana Sayfa</h5>
         </a>
 
-        <a asp-controller="Home" asp-action="Index" class="list-group-item list-group-item-action bg-transparent border-0 px-2 py-3 font-weight-bold text-white">
-            <h5 class="mb-0"><i class="fas fa-stream mr-3 text-primary" style="width:25px;"></i> Akış</h5>
+        <a asp-controller="Home" asp-action="Akis" class="nav-link text-dark font-weight-bold mb-3 d-flex align-items-center p-2 rounded hover-bg">
+            <i class="fas fa-stream mr-3" style="color: #d63384; font-size: 1.2rem;"></i>
+            <span style="font-size: 1.1rem;">Akış</span>
         </a>
 
         @if (User.Identity.IsAuthenticated)

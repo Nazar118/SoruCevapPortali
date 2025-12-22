@@ -1,0 +1,195 @@
+﻿@using SoruCevapPortali.Models
+@model List<FeedItemViewModel>
+
+@{
+    ViewData["Title"] = "Akış";
+}
+
+<div class="container mt-4">
+    <div class="row">
+
+        <div class="col-lg-8">
+            <h4 class="mb-4 font-weight-bold" style="color: #e0e0e0;"><i class="fas fa-stream text-primary"></i> Güncel Akış</h4>
+
+            @foreach (var item in Model)
+            {
+                // --- TÜR 1: SORU KARTI (Sade) ---
+                if (item.Type == FeedType.Question)
+                {
+                    <div class="card mb-4 shadow-sm border-0" style="background-color: #2c2f33; border-left: 5px solid #ffc107 !important; border-radius: 8px;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <small class="text-warning"><i class="fas fa-question-circle"></i> Yeni Soru • @item.CategoryName</small>
+                                <small class="text-muted">@item.Date.ToString("HH:mm")</small>
+                            </div>
+                            <h5 class="font-weight-bold">
+                                <a asp-controller="Question" asp-action="Details" asp-route-id="@item.Id" class="text-white text-decoration-none">
+                                    @item.Title
+                                </a>
+                            </h5>
+                            <div class="d-flex align-items-center mt-3">
+                                <div class="bg-secondary rounded-circle text-center text-white pt-1 mr-2" style="width:30px; height:30px; font-weight:bold;">@item.UserName.Substring(0, 1)</div>
+                                <span class="text-light small">@item.UserName sordu</span>
+                                <span class="ml-auto badge badge-dark border border-secondary">@item.AnswerCount Cevap</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                // --- TÜR 2: CEVAP KARTI (Etkileşim Odaklı) ---
+                else if (item.Type == FeedType.Answer)
+                {
+                    <div class="card mb-4 shadow-sm border-0" style="background-color: #2c2f33; border-left: 5px solid #0d6efd !important; border-radius: 8px;">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-comment-dots text-primary mr-2"></i>
+                                <strong class="text-white mr-1">@item.UserName</strong>
+                                <span class="text-muted small">şu soruya cevap verdi:</span>
+                            </div>
+
+                            <p class="mb-2 text-muted small border-left border-secondary pl-2 font-italic">
+                                <a asp-controller="Question" asp-action="Details" asp-route-id="@item.Id" class="text-secondary text-decoration-none">
+                                    "@item.TargetQuestionTitle"
+                                </a>
+                            </p>
+
+                            <div class="p-3 rounded text-white" style="background-color: #23272a; font-size: 0.95rem;">
+                                "@(item.Content.Length > 150 ? item.Content.Substring(0, 150) + "..." : item.Content)"
+                            </div>
+
+                            <a asp-controller="Question" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-link pl-0 mt-2 text-primary">Tartışmaya Git →</a>
+                        </div>
+                    </div>
+                }
+
+                // --- TÜR 3: BİLGİ KARTI (DİNAMİK) ---
+                // Buraya 'feed-info-card' sınıfı ekledik ki JS ile bulup değiştirebilelim.
+                else if (item.Type == FeedType.InfoCard)
+                {
+                    <div class="card mb-4 shadow border-0 feed-info-card" style="border-radius: 12px; background-color: #f1f3f5; border-left: 6px solid #20c997 !important;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-success text-white info-category"><i class="fas fa-lightbulb"></i> @item.CategoryName</span>
+                                <small class="text-secondary" style="font-weight: 600;">Biliyor muydun?</small>
+                            </div>
+
+                            <h4 class="font-weight-bold mb-3 info-title" style="color: #212529;">@item.Title</h4>
+
+                            <p class="info-content" style="color: #495057; font-size: 1.1rem; line-height: 1.6; font-family: 'Georgia', serif; font-style: italic;">
+                                "@item.Content"
+                            </p>
+
+                            <div class="text-end mt-2">
+                                <small class="text-muted info-user" style="color: #6c757d !important;">— @item.UserName</small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="col-lg-4 d-none d-lg-block">
+
+            <div class="card shadow-sm mb-4 border-0" style="background: linear-gradient(145deg, #1e1e2f, #2a2a40); position: sticky; top: 20px;">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-warning"><i class="fas fa-sync-alt fa-spin hover-stop"></i> Bilgileri Tazele</h5>
+
+                    <p id="sidebar-info-text" class="card-text font-italic mt-3 text-white small" style="min-height: 60px;">
+                        "Aşağıdaki butona tıklayarak akıştaki bilgi kartlarını ve buradaki bilgiyi anında değiştirebilirsin."
+                    </p>
+
+                    <button class="btn btn-outline-light mt-2 rounded-pill px-4" onclick="bilgileriTazele()">
+                        <i class="fas fa-random me-2"></i> Yeni Bilgi Getir
+                    </button>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 mt-4" style="background-color: #2c2f33;">
+                <div class="card-header border-0 font-weight-bold text-danger" style="background-color: #23272a;">
+                    <i class="fas fa-fire"></i> Bugün Trend
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-white" style="background-color: #2c2f33;">
+                        Cilt Bakımı
+                        <span class="badge badge-primary rounded-pill">14</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-white" style="background-color: #2c2f33;">
+                        Yazılım Dünyası
+                        <span class="badge badge-primary rounded-pill">8</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-white" style="background-color: #2c2f33;">
+                        Evcil Hayvanlar
+                        <span class="badge badge-primary rounded-pill">5</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Zengin Bilgi Havuzu (Category, Title, Content, User)
+    const bilgiHavuzu = [
+        { cat: "Hayvanlar Alemi", title: "Ahtapotların Kalbi", content: "Ahtapotların üç tane kalbi vardır. Biri vücuda kan pompalar, diğer ikisi solungaçlara.", user: "Doğa Botu" },
+        { cat: "Bitkiler Alemi", title: "Muz Meyve Değildir", content: "Botanik açıdan muz bir meyve değil, bir ottur. Çilek ise meyve değil, çiçek tablasıdır.", user: "Botanikçi" },
+        { cat: "Uzay", title: "Uzayda Sessizlik", content: "Uzayda atmosfer olmadığı için ses dalgaları yayılamaz. Yani uzay tamamen sessizdir.", user: "AstroBilgi" },
+        { cat: "İnsan Vücudu", title: "Damar Uzunluğu", content: "Bir yetişkinin damarlarını uca uca ekleseydiniz, dünyayı 4 kez dolaşabilirdiniz.", user: "Dr. Bilgi" },
+        { cat: "Tarih", title: "En Kısa Savaş", content: "Tarihin en kısa savaşı İngiltere ile Zanzibar arasında yaşanmış ve sadece 38 dakika sürmüştür.", user: "Tarihçi Dede" },
+        { cat: "Teknoloji", title: "İlk Bilgisayar", content: "İlk bilgisayar faresi tahtadan yapılmıştı.", user: "TechGuru" },
+        { cat: "Coğrafya", title: "Çöl Kumu", content: "Sahra Çölü'nden kalkan kumlar rüzgarla Amazon Ormanları'na kadar gidip orayı gübreler.", user: "Gezgin" },
+        { cat: "Psikoloji", title: "Müzik ve Kalp", content: "Dinlediğiniz müziğin ritmine göre kalp atışınız değişebilir ve senkronize olabilir.", user: "Zihin Rehberi" },
+        { cat: "Spor", title: "Basketbolun İcadı", content: "Basketbol ilk bulunduğunda şeftali sepetleri kullanılıyordu ve her sayıdan sonra topu merdivenle alıyorlardı.", user: "Sporcu" },
+        { cat: "Genel Kültür", title: "Balın Ömrü", content: "Bal, bozulmayan tek gıdadır. Mısır piramitlerinde bulunan 3000 yıllık bal hala yenilebilir durumdadır.", user: "Arı Maya" },
+        { cat: "Hayvanlar Alemi", title: "Yunusların İsimleri", content: "Yunuslar birbirlerine özel ıslık sesleriyle hitap eder. Bu sesler onların adları gibidir.", user: "Doğa Botu" },
+        { cat: "Hayvanlar Alemi", title: "Karıncaların Gücü", content: "Bir karınca kendi ağırlığının yaklaşık 50 katını taşıyabilir.", user: "Doğa Botu" },
+        { cat: "Hayvanlar Alemi", title: "Zürafaların Dili", content: "Zürafaların dili yaklaşık 45 cm uzunluğundadır ve koyu renklidir. Bu, güneşten yanmasını önler.", user: "Doğa Botu" },
+        { cat: "Hayvanlar Alemi", title: "Kedilerin Mırlaması", content: "Kediler sadece mutlu olduklarında değil, stresli ya da yaralı olduklarında da mırlar.", user: "Doğa Botu" },
+        { cat: "Hayvanlar Alemi", title: "Deniz Atı Babaları", content: "Deniz atlarında yumurtaları taşıyan ve doğuran canlı erkek deniz atıdır.", user: "Doğa Botu" },
+        { cat: "Hayvanlar Alemi", title: "Baykuşların Boynu", content: "Baykuşlar başlarını neredeyse 270 derece döndürebilir.", user: "Doğa Botu" },
+        { cat: "Hayvanlar Alemi", title: "Köpeklerin Koku Yeteneği", content: "Köpeklerin koku alma duyusu insanlardan yaklaşık 10.000 kat daha gelişmiştir.", user: "Doğa Botu" },
+        { cat: "Hayvanlar Alemi", title: "Penguenlerin Eş Sadakati", content: "Bazı penguen türleri aynı eşle yıllarca birlikte yaşar.", user: "Doğa Botu" },
+        { cat: "Hayvanlar Alemi", title: "Akreplerin Işıltısı", content: "Akrepler, ultraviyole ışık altında parlak şekilde ışıldar.", user: "Doğa Botu" },
+        { cat: "Hayvanlar Alemi", title: "Fil Hafızası", content: "Filler çok güçlü bir hafızaya sahiptir ve yıllar sonra bile diğer filleri tanıyabilir.", user: "Doğa Botu" }
+
+    ];
+
+    function bilgileriTazele() {
+        // A) Akıştaki Tüm Bilgi Kartlarını Bul
+        const kartlar = document.querySelectorAll('.feed-info-card');
+
+        // B) Her bir kart için havuzdan rastgele ve benzersiz veri seç
+        // (Basitçe rastgele seçelim, aynı gelme ihtimali düşük)
+
+        kartlar.forEach(kart => {
+            // Rastgele bir index seç
+            const rastgeleIndex = Math.floor(Math.random() * bilgiHavuzu.length);
+            const secilenBilgi = bilgiHavuzu[rastgeleIndex];
+
+            // Animasyon efekti: Önce şeffaflaştır, sonra içeriği değiştir, sonra geri getir
+            kart.style.opacity = '0';
+            kart.style.transition = 'opacity 0.3s ease';
+
+            setTimeout(() => {
+                // İçerikleri Değiştir
+                kart.querySelector('.info-category').innerHTML = '<i class="fas fa-lightbulb"></i> ' + secilenBilgi.cat;
+                kart.querySelector('.info-title').innerText = secilenBilgi.title;
+                kart.querySelector('.info-content').innerText = '"' + secilenBilgi.content + '"';
+                kart.querySelector('.info-user').innerText = '— ' + secilenBilgi.user;
+
+                // Geri Görünür Yap
+                kart.style.opacity = '1';
+            }, 300);
+        });
+
+        // C) Sağdaki Küçük Kutuyu da Güncelle
+        const sidebarText = document.getElementById('sidebar-info-text');
+        const yanIndex = Math.floor(Math.random() * bilgiHavuzu.length);
+
+        sidebarText.style.opacity = '0';
+        setTimeout(() => {
+            sidebarText.innerText = '"' + bilgiHavuzu[yanIndex].content + '"';
+            sidebarText.style.opacity = '1';
+        }, 300);
+    }
+</script>
