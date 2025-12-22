@@ -5,10 +5,10 @@ using SoruCevapPortali.Models;
 
 namespace SoruCevapPortali.Repositories
 {
-    public class AnswerRepository : IRepository<Answer>
+    public class AnswerRepository : Repository<Answer>
     {
         private readonly ApplicationDbContext _context;
-        public AnswerRepository(ApplicationDbContext context)
+        public AnswerRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
         }

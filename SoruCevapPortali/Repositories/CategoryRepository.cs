@@ -4,10 +4,10 @@ using SoruCevapPortali.Models;
 
 namespace SoruCevapPortali.Repositories
 {
-    public class CategoryRepository : IRepository<Category>
+    public class CategoryRepository : Repository<Category>
     {
         private readonly ApplicationDbContext _context;
-        public CategoryRepository(ApplicationDbContext context)
+        public CategoryRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
         }

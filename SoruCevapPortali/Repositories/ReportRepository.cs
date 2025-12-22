@@ -5,11 +5,11 @@ using SoruCevapPortali.Models;
 
 namespace SoruCevapPortali.Repositories
 {
-    public class ReportRepository : IRepository<Report>
+    public class ReportRepository : Repository<Report>
     {
         private readonly ApplicationDbContext _context;
 
-        public ReportRepository(ApplicationDbContext context)
+        public ReportRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
         }

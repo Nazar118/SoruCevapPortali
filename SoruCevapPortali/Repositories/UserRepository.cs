@@ -4,12 +4,12 @@ using SoruCevapPortali.Models;
 
 namespace SoruCevapPortali.Repositories
 {
-    public class UserRepository : IRepository<User>
+    public class UserRepository : Repository<User>
     {
         private readonly ApplicationDbContext _context;
 
         // Bu sınıfa çalışması için veritabanı bağlantısı (DbContext) veriliyor.
-        public UserRepository(ApplicationDbContext context)
+        public UserRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
         }
