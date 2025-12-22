@@ -1,19 +1,18 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SoruCevapPortali.Data;
 using SoruCevapPortali.Models;
-using System.Security.Claims;
 
 namespace SoruCevapPortali.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-        public AccountController(ApplicationDbContext context)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
         {
-            _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         // 1. GİRİŞ YAP SAYFASI
@@ -23,57 +22,51 @@ namespace SoruCevapPortali.Controllers
             // Zaten giriş yapmışsa yönlendir
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                if (User.IsInRole("Admin")) return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
                 return RedirectToAction("Index", "Home");
             }
             return View();
         }
 
-        // 2. GİRİŞ YAP İŞLEMİ
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
-            // Kullanıcıyı bul
-            var kullanici = _context.Users.FirstOrDefault(k => k.Email == email && k.Password == password);
-
-            if (kullanici != null)
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, kullanici.User_name),
-                    new Claim(ClaimTypes.Email, kullanici.Email),
-                    new Claim("UserId", kullanici.Id.ToString())
-                };
+                ViewBag.Error = "Lütfen tüm alanları doldurun.";
+                return View();
+            }
 
-                // Rol Atama
-                if (kullanici.IsAdmin == true)
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                user = await _userManager.FindByNameAsync(email);
+            }
+
+            if (user != null)
+            {
+                if (user.PasswordHash == password)
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+
+
+                    if (user.IsAdmin) return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                    return RedirectToAction("Index", "Home");
                 }
-                else
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, "User"));
-                }
 
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties();
+                var result = await _signInManager.PasswordSignInAsync(user, password, false, false);
 
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-
-                // Yönlendirme Kontrolü
-                if (kullanici.IsAdmin == true)
+                if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
-                }
-                else
-                {
+                    if (user.IsAdmin) return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
                     return RedirectToAction("Index", "Home");
                 }
             }
 
-            ViewBag.Error = "Geçersiz e-posta veya şifre.";
+            ViewBag.Error = "Geçersiz kullanıcı adı/e-posta veya şifre.";
             return View();
         }
+
 
         // 3. KAYIT OL SAYFASI
         [HttpGet]
@@ -83,35 +76,59 @@ namespace SoruCevapPortali.Controllers
             return View();
         }
 
-        // 4. KAYIT OL İŞLEMİ (Düzeltildi)
+        // 4. KAYIT OL İŞLEMİ (Identity ile Hashleyerek Kayıt)
         [HttpPost]
         public async Task<IActionResult> Register(User model)
         {
-            if (ModelState.IsValid)
+            // Identity User_name yerine UserName kullanır, onu eşleyelim
+            model.UserName = model.User_name;
+
+            // Validasyon kontrolü (Basitçe)
+            if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
             {
-                var exists = _context.Users.Any(u => u.Email == model.Email || u.User_name == model.User_name);
-                if (exists)
-                {
-                    ViewBag.Error = "Bu e-posta veya kullanıcı adı zaten kullanılıyor.";
-                    return View(model);
-                }
+                ViewBag.Error = "Lütfen bilgileri eksiksiz girin.";
+                return View(model);
+            }
 
-                model.registration_date = DateTime.Now;
-                model.Is_it_active = true;
-                model.IsAdmin = false;
+            var existingUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existingUser != null)
+            {
+                ViewBag.Error = "Bu e-posta zaten kullanılıyor.";
+                return View(model);
+            }
 
-                _context.Users.Add(model);
-                await _context.SaveChangesAsync();
+            // Yeni kullanıcı ayarları
+            model.registration_date = DateTime.Now;
+            model.Is_it_active = true;
+            model.IsAdmin = false;
+            // SecurityStamp Identity için gereklidir
+            model.SecurityStamp = Guid.NewGuid().ToString();
 
+            // Identity ile oluştur (Şifreyi otomatik Hashler!)
+            var result = await _userManager.CreateAsync(model, model.Password);
+
+            if (result.Succeeded)
+            {
+                // Başarılıysa giriş sayfasına yönlendir
                 return RedirectToAction("Login");
             }
+            else
+            {
+                // Identity'den dönen hataları göster (Örn: Şifre çok basit vs.)
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                ViewBag.Error = "Kayıt oluşturulamadı. Şifreniz en az 1 büyük harf, 1 küçük harf ve rakam içermelidir.";
+            }
+
             return View(model);
         }
 
-        // 5. ÇIKIŞ YAP
+        // 5. ÇIKIŞ YAP (Identity Yöntemi)
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
     }

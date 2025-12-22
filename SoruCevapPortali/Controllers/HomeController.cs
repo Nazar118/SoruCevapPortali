@@ -78,17 +78,38 @@ namespace SoruCevapPortali.Controllers
                 {
                     Id = q.Id,
                     Title = q.title,
+                    // Ýçerik çok uzunsa kýsalt
                     ContentSummary = q.contents.Length > 100 ? q.contents.Substring(0, 100) + "..." : q.contents,
                     CategoryName = q.Category.Name,
                     CategoryId = q.Category.Id,
                     UserName = q.User.User_name,
                     AnswerCount = q.Answers.Count(a => !a.IsDeleted),
                     CreatedDate = q.creation_date,
-                    IsSolved = q.Answers.Any(a => a.IsBestAnswer)
+                    IsSolved = q.Answers.Any(a => a.IsBestAnswer),
+
+                    FeaturedAnswerContent = q.Answers
+                        .Where(a => !a.IsDeleted && a.IsBestAnswer)
+                        .Select(a => a.contents)
+                        .FirstOrDefault()
+                        ?? q.Answers
+                        .Where(a => !a.IsDeleted)
+                        .Select(a => a.contents)
+                        .FirstOrDefault(),
+
+                    // Ayný mantýkla Kullanýcý Adýný al
+                    FeaturedAnswerUserName = q.Answers
+                        .Where(a => !a.IsDeleted && a.IsBestAnswer)
+                        .Select(a => a.User.User_name)
+                        .FirstOrDefault()
+                        ?? q.Answers
+                        .Where(a => !a.IsDeleted)
+                        .Select(a => a.User.User_name)
+                        .FirstOrDefault(),
+
+                    // Gösterilen cevap "En Ýyi Cevap" mý kontrol et
+                    IsFeaturedAnswerBest = q.Answers.Any(a => !a.IsDeleted && a.IsBestAnswer)
                 })
                 .ToList();
-
-            // --- SIDEBAR VERÝLERÝ (Aynen Korundu) ---
 
             // Kategoriler
             ViewBag.Categories = _context.Categories

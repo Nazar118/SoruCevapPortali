@@ -1,29 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema; 
 
 namespace SoruCevapPortali.Models
 {
-    public class User
+    public class User : IdentityUser<int>
     {
-        public int Id { get; set; }
+        public string? User_name { get; set; }
+        public string? Password { get; set; }
+        public DateTime registration_date { get; set; }
+        public bool Is_it_active { get; set; }
+        public bool IsAdmin { get; set; } = false;
+        public int WarningCount { get; set; }
 
-        [Required]
-        public string User_name { get; set; } // SQL: User_name
-
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
-
-        [Required]
-        public string Password { get; set; }
-
-        public DateTime registration_date { get; set; } // SQL: registration_date
-        public bool Is_it_active { get; set; }          // SQL: Is_it_active
-
-        public bool IsAdmin { get; set; } = false; // Varsayılan olarak herkes normal üyedir.
-
+        [InverseProperty("User")]
         public virtual ICollection<Question>? Questions { get; set; }
-        public virtual ICollection<Answer>? Answers { get; set; }
 
-        public int WarningCount { get; set; } // Kullanıcının aldığı uyarı sayısı
+        // "Answer tablosundaki 'User' alanı ile bu listeyi eşleştir" diyoruz.
+        [InverseProperty("User")]
+        public virtual ICollection<Answer>? Answers { get; set; }
     }
 }

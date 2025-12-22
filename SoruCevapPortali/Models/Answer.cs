@@ -16,7 +16,6 @@ namespace SoruCevapPortali.Models
 
         public bool IsApproved { get; set; } = true;
 
-        // === YENİ EKLENEN: SİLİNDİ Mİ? ===
         public bool IsDeleted { get; set; } = false;
 
         public int UserId { get; set; }
@@ -27,6 +26,7 @@ namespace SoruCevapPortali.Models
         [ForeignKey("QuestionId")]
         public virtual Question? Question { get; set; }
 
+        [InverseProperty("Answer")]
         public virtual ICollection<Report>? Reports { get; set; }
         [NotMapped]
         public bool IsLikedByCurrentUser { get; set; }

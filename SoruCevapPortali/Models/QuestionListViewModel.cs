@@ -14,6 +14,9 @@ namespace SoruCevapPortali.Models
         public int AnswerCount { get; set; }
         public DateTime CreatedDate { get; set; }
         public bool IsSolved { get; set; }
+        public string FeaturedAnswerContent { get; set; } // Gösterilecek cevabın içeriği
+        public string FeaturedAnswerUserName { get; set; } // Cevabı yazan kişi
+        public bool IsFeaturedAnswerBest { get; set; } // Bu cevap "En İyi" mi?
 
 
         // 1. StatusText için özel alan (Backing Field)

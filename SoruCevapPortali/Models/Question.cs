@@ -19,10 +19,8 @@ namespace SoruCevapPortali.Models
 
         public DateTime creation_date { get; set; } // SQL: creation_date
 
-        // Mevcut onay sütunun (Adını değiştirmedik, veri kaybı olmasın)
         public bool Is_it_approved { get; set; }
 
-        // === YENİ EKLENEN: SİLİNDİ Mİ? (Soft Delete) ===
         public bool IsDeleted { get; set; } = false;
 
         public int UserId { get; set; }
@@ -31,9 +29,8 @@ namespace SoruCevapPortali.Models
 
         public virtual ICollection<Answer>? Answers { get; set; }
 
-        // === YENİ EKLENEN: BU SORUYA GELEN ŞİKAYETLER ===
+        [InverseProperty("Question")]
         public virtual ICollection<Report>? Reports { get; set; }
-        // Question class'ının süslü parantezleri bitmeden hemen önceye:
 
         [NotMapped] 
         public bool IsFavoritedByCurrentUser { get; set; }

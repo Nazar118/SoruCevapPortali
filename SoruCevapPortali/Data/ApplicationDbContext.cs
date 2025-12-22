@@ -1,15 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SoruCevapPortali.Models;
 
 namespace SoruCevapPortali.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
 
-        public DbSet<User> Users { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Answer> Answers { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -19,39 +20,8 @@ namespace SoruCevapPortali.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder); // Identity tabloları için ŞART!
 
-            // DÜZELTME: SoranKullanici -> User, KullaniciId -> UserId
-            modelBuilder.Entity<Question>()
-                .HasOne(q => q.User)
-                .WithMany()
-                .HasForeignKey(q => q.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // DÜZELTME: CevaplayanKullanici -> User, KullaniciId -> UserId
-            modelBuilder.Entity<Answer>()
-                .HasOne(a => a.User)
-                .WithMany()
-                .HasForeignKey(a => a.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-            // Rapor silinirse User silinmesin diye önlem (Restrict)
-            modelBuilder.Entity<Report>()
-                .HasOne(r => r.Reporter)
-                .WithMany()
-                .HasForeignKey(r => r.UserId) // ReporterId yerine UserId kullanıyoruz
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Report>()
-                .HasOne(r => r.Question)
-                .WithMany()
-                .HasForeignKey(r => r.QuestionId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Report>()
-                .HasOne(r => r.Answer)
-                .WithMany()
-                .HasForeignKey(r => r.AnswerId)
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
