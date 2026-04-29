@@ -40,8 +40,6 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
                         new Claim("UserId", kullanici.Id.ToString())
                     };
 
-                    // === DÜZELTME 1: ROL KONTROLÜ ===
-                    // Herkese Admin vermek yerine, IsAdmin durumuna bakıyoruz.
                     if (kullanici.IsAdmin == true)
                     {
                         claims.Add(new Claim(ClaimTypes.Role, "Admin"));
@@ -50,7 +48,6 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
                     {
                         claims.Add(new Claim(ClaimTypes.Role, "User"));
                     }
-                    // =================================
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     var authProperties = new AuthenticationProperties { };
@@ -58,8 +55,6 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
                     TempData["ShowWelcomeAnimation"] = true;
 
-                    // === DÜZELTME 2: YÖNLENDİRME KONTROLÜ ===
-                    // Yöneticiyse Panele, Üyeyse Ana Sayfaya gitsin.
                     if (kullanici.IsAdmin == true)
                     {
                         return RedirectToAction("Index", "Dashboard");
@@ -68,7 +63,6 @@ namespace SoruCevapPortali.Areas.Admin.Controllers
                     {
                         return RedirectToAction("Index", "Home", new { area = "" });
                     }
-                    // ========================================
                 }
                 else
                 {
